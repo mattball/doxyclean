@@ -1,4 +1,4 @@
-DoxyClean 0.2
+DoxyClean 0.5
 ---------------
 
 The files included herein are licensed according to the MIT License.
@@ -26,18 +26,19 @@ If you make any modifications to DoxyClean which might be of use, please send th
 
 Changes:
 
-Mar. 29, 2008 (0.2)		-	* Added support for protocols
-							* Fixed spacing on protocol declarations for data types: 
-								"id< protocol >" now displays as "id<protocol>"
-							* Added a "last updated" timestamp at the bottom of object pages
-							* Added mouse-over tooltips to Tasks links
+Aug. 23, 2008 (0.5)     -   * Links to other classes/categories/protocols in the project are now preserved
+                            * Section headers on the index page now only display if there are files of that type in the project
 
-Mar. 16, 2008 (0.1.2)	-	* Fixed bug where an error would occur if the project either contained no
-								classes or no categories.
+Mar. 29, 2008 (0.2)     -   * Added support for protocols
+                            * Fixed spacing on protocol declarations for data types: 
+                                "id< protocol >" now displays as "id<protocol>"
+                            * Added a "last updated" timestamp at the bottom of object pages
+                            * Added mouse-over tooltips to Tasks links
 
-Feb. 24, 2008 (0.1.1)	-	* Fixed prototype formatting (multiple parameter no longer run together)
-							* DoxyClean now only generates documentation for classes/categories 
-								which have been documented
-							* Fixed issue with printing XHTML output
+Mar. 16, 2008 (0.1.2)   -   * Fixed bug where an error would occur if the project either contained no classes or no categories.
+
+Feb. 24, 2008 (0.1.1)   -   * Fixed prototype formatting (multiple parameter no longer run together)
+                            * DoxyClean now only generates documentation for classes/categories which have been documented
+                            * Fixed issue with printing XHTML output
 							
-Feb. 17, 2008 (0.1)		-	* Initial Release
+Feb. 17, 2008 (0.1)     -   * Initial Release

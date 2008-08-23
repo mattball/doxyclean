@@ -145,77 +145,23 @@ def createIndexXML(inputDirectory):
 	projectElement = indexXML.createElement("project")
 	indexXML.appendChild(projectElement)
 	
-	# Define the various subdirectories
-	classPath = inputDirectory + '/Classes'
-	categoryPath = inputDirectory + '/Categories'
-	protocolPath = inputDirectory + '/Protocols'
-	
-	# Get each class
-	if os.path.exists(classPath):
-		for fileName in os.listdir(classPath):
-			classFile = minidom.parse(classPath + '/' + fileName)
-		
-			# Get the object name
-			nameList = classFile.getElementsByTagName('name')
-			objectName = nameList[0].firstChild.data
-		
-			# Get the object type
-			objectList = classFile.getElementsByTagName('object')
-			objectType = objectList[0].attributes['kind'].value
-		
-			# Create a <object> element
-			objectElement = indexXML.createElement("object")
-			objectElement.setAttribute("kind", "class")
-			projectElement.appendChild(objectElement)
-		
-			# Create the <name> element
-			nameElement = indexXML.createElement("name")
-			objectElement.appendChild(nameElement)
-			nameText = indexXML.createTextNode(objectName)
-			nameElement.appendChild(nameText)
-		
-	# Get each category
-	if os.path.exists(categoryPath):
-		for fileName in os.listdir(categoryPath):
-			categoryFile = minidom.parse(categoryPath + '/' + fileName)
-
-			# Get the object name
-			nameList = categoryFile.getElementsByTagName('name')
-			objectName = nameList[0].firstChild.data
-
-			# Get the object type
-			objectList = categoryFile.getElementsByTagName('object')
-			objectType = objectList[0].attributes['kind'].value
-
-			# Create a <object> element
-			objectElement = indexXML.createElement("object")
-			objectElement.setAttribute("kind", "category")
-			projectElement.appendChild(objectElement)
-
-			# Create the <name> element
-			nameElement = indexXML.createElement("name")
-			objectElement.appendChild(nameElement)
-			nameText = indexXML.createTextNode(objectName)
-			nameElement.appendChild(nameText)
+	for (path, dirs, files) in os.walk(inputDirectory):
+		for fileName in files:
+			xmlFile = minidom.parse(path + '/' + fileName)
 			
-	# Get each protocol
-	if os.path.exists(protocolPath):
-		for fileName in os.listdir(protocolPath):
-			protocolFile = minidom.parse(protocolPath + '/' + fileName)
-
 			# Get the object name
-			nameList = protocolFile.getElementsByTagName('name')
+			nameList = xmlFile.getElementsByTagName('name')
 			objectName = nameList[0].firstChild.data
-
-			# Get the object type
-			objectList = protocolFile.getElementsByTagName('object')
+			
+			# Get the objectType
+			objectList = xmlFile.getElementsByTagName('object')
 			objectType = objectList[0].attributes['kind'].value
-
-			# Create a <object> element
+			
+			# Create an <object> element
 			objectElement = indexXML.createElement("object")
-			objectElement.setAttribute("kind", "protocol")
+			objectElement.setAttribute("kind", objectType)
 			projectElement.appendChild(objectElement)
-
+			
 			# Create the <name> element
 			nameElement = indexXML.createElement("name")
 			objectElement.appendChild(nameElement)
@@ -242,25 +188,7 @@ def convertIndexToXHTML(xmlPath, outputDirectory):
 def linkify(inputDirectory):
 	indexFile = minidom.parse(inputDirectory + '/index.xml')
 	documentedObjects = indexFile.getElementsByTagName('name')
-#	for currentObject in documentedObjects:
-		# Get info about the current object
-#		objectName = currentObject.getElementsByTagName('name')[0].firstChild.data
-#		objectType = currentObject.attributes['kind'].value
-		
-		# Remove newlines and tabs from the object name
-		# This is needed because of a "feature" in the minidom's prettyprint
-#		objectName = objectName.replace('\n', '').replace('\t', '')
-		
-		# Determine the path to the current object
-#		objectPath = inputDirectory
-#		if objectType == 'class':
-#			objectPath += '/Classes'
-#		elif objectType == 'category':
-#			objectPath += '/Categories'
-#		elif objectType == 'protocol':
-#			objectPath += '/Protocols'
-#		objectPath += '/' + objectName + '.xml'
-		
+	
 	# Get each file
 	for (path, dirs, files) in os.walk(inputDirectory):
 		for fileName in files:
