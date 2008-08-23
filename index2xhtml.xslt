@@ -14,23 +14,29 @@
 			<div id="mainContainer">
 				<h1><a name="title" /><xsl:apply-templates select="project" mode="title"/></h1>
 				
-				<div class="column">
-					<h5>Class References</h5>
-					<ul>
-						<xsl:apply-templates select="project/object[@kind='class']"/>
-					</ul>
-				</div>
+				<xsl:if test="count(project/object[@kind='class']) > 0">
+					<div class="column">
+						<h5>Class References</h5>
+						<ul>
+							<xsl:apply-templates select="project/object[@kind='class']"/>
+						</ul>
+					</div>
+				</xsl:if>
 				
 				<div class="column">
-					<h5>Protocol References</h5>
-					<ul>
-						<xsl:apply-templates select="project/object[@kind='protocol']"/>
-					</ul>
+					<xsl:if test="count(project/object[@kind='protocol']) > 0">
+						<h5>Protocol References</h5>
+						<ul>
+							<xsl:apply-templates select="project/object[@kind='protocol']"/>
+						</ul>
+					</xsl:if>
 						
-					<h5>Category References</h5>
-					<ul>
-						<xsl:apply-templates select="project/object[@kind='category']"/>
-					</ul>
+					<xsl:if test="count(project/object[@kind='category']) > 0">
+						<h5>Category References</h5>
+						<ul>
+							<xsl:apply-templates select="project/object[@kind='category']"/>
+						</ul>
+					</xsl:if>
 				</div>
 				
 				<div class="clear"></div>

@@ -188,9 +188,18 @@
 		</li>
 	</xsl:template>
 	
-<!--	<xsl:template match="ref">
-		<code><xsl:apply-templates/></code>
-	</xsl:template>-->
+	<xsl:template match="ref">
+		<code>
+			<xsl:choose>
+				<xsl:when test="/object/name != @id">
+			<a><xsl:attribute name="href"><xsl:value-of select="@id"/>.html</xsl:attribute><xsl:apply-templates/></a>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</code>
+	</xsl:template>
 	
 	<xsl:template match="member/file">
 <xsl:text>
