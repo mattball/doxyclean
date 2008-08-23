@@ -121,9 +121,18 @@
 		</xsl:copy>
     </xsl:template>-->
 
-	<xsl:template match="ref">
-		<xsl:apply-templates/>
-	</xsl:template>
+<!--	<xsl:template match="ref">
+		
+		<ref>
+	      <xsl:attribute name="id">
+	        <xsl:value-of select="text()"/>
+	      </xsl:attribute>
+	      <xsl:attribute name="kind">
+	        <xsl:value-of select="@kindref"/>
+	      </xsl:attribute>
+	      <xsl:apply-templates/>
+	    </ref>
+	</xsl:template>-->
 	
 	<xsl:template match="para">
 		<para><xsl:apply-templates/></para>

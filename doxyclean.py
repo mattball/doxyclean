@@ -26,8 +26,7 @@
 import getopt, sys, os, fnmatch
 from xml.dom import minidom
 
-def usage (e):
-	sys.stderr.write('doxyclean.py: %s\n' % e)
+def usage ():
 	sys.stderr.write('''\
 	Usage: doxyclean.py [-h] [-i indir] [-o outdir]
 
@@ -55,138 +54,101 @@ def _mkdir(newdir):
         head, tail = os.path.split(newdir)
         if head and not os.path.isdir(head):
             _mkdir(head)
-        #print "_mkdir %s" % repr(newdir)
+
         if tail:
             os.mkdir(newdir)
+
+def fileIsDocumented(filePath):
+	# Check if the object is documented
+	originaldoc = minidom.parse(filePath)
+	briefList = originaldoc.getElementsByTagName('briefdescription')
+	detailList = originaldoc.getElementsByTagName('detaileddescription')
 	
-if __name__ == '__main__':	
-	# Set the default directories
-	inputDirectory = os.getcwd()
-	outputDirectory = os.getcwd()
-	
-	shouldConvertToXHTML = 0
-	
-	opts, args = getopt.getopt(sys.argv[1:], 'i:o:h')
-	for option, value in opts:
-		if option[1] == 'i':
-			inputDirectory = value
-		elif option[1] == 'o':
-			outputDirectory = value
-		elif option[1] == 'h':
-			shouldConvertToXHTML = 1
-	
-	if not os.path.exists(inputDirectory):
-		print 'ERROR: Input path does not exist: ' + inputDirectory
-		sys.exit(1)
-		
+	for briefItem in briefList:
+		paraList = briefItem.getElementsByTagName('para')
+		if len(paraList) > 0:
+			return 1
+			
+	for detailItem in detailList:
+		paraList = detailItem.getElementsByTagName('para')
+		if len(paraList) > 0:
+			return 1
+
+	return 0
+
+def cleanXML(fileName, inputDirectory, outputDirectory):
 	_mkdir(outputDirectory)
-		
-	xmlOutputDirectory = outputDirectory + "/DoxyCleaned/xml"
-	_mkdir(xmlOutputDirectory)
 	
-	# Set the path for different kinds of objects
-	classPath = xmlOutputDirectory + '/Classes'
-	categoryPath = xmlOutputDirectory + '/Categories'
-	protocolPath = xmlOutputDirectory + '/Protocols'
-	
+	# Perform the XSL Transform
+	inputPath = inputDirectory + '/' + fileName
+	tempPath = outputDirectory + '/' + fileName
 	stylesheetPath = sys.path[0] + '/object.xslt'
+	os.system('xsltproc -o "' + tempPath + '" "' + stylesheetPath + '" "' + inputPath + '"')
+
+	# We will get values from the xml file
+	xmldoc = minidom.parse(tempPath)
+
+	# Get the object name
+	nameList = xmldoc.getElementsByTagName('name')
+	objectName = nameList[0].firstChild.data
+
+	# Get the object type
+	objectList = xmldoc.getElementsByTagName('object')
+	objectType = objectList[0].attributes['kind'].value
+
+	if objectType == 'class':
+		finalPath = outputDirectory + '/Classes'
+	elif objectType == 'category':
+		finalPath = outputDirectory + '/Categories'
+
+		# Set the filename to something more URL-friendly
+		objectName = objectName.replace('(', '_').replace(')', '')
+	elif objectType == 'protocol':
+		finalPath = outputDirectory + '/Protocols'
 		
-	for fileName in os.listdir(inputDirectory):
-		if fnmatch.fnmatch(fileName, 'interface_*.xml') or fnmatch.fnmatch(fileName, 'protocol_*.xml'):
-			
-			# Check if the object is documented
-			originaldoc = minidom.parse(inputDirectory + '/' + fileName)
-			briefList = originaldoc.getElementsByTagName('briefdescription')
-			detailList = originaldoc.getElementsByTagName('detaileddescription')
-			
-			shouldConvert = 0
-			
-			for briefItem in briefList:
-				paraList = briefItem.getElementsByTagName('para')
-				if len(paraList) > 0:
-					shouldConvert = 1
-					break
-					
-			for detailItem in detailList:
-				if shouldConvert:
-					break
-				paraList = detailItem.getElementsByTagName('para')
-				if len(paraList) > 0:
-					shouldConvert = 1
-					break
+	_mkdir(finalPath)
 
-			if shouldConvert:
-				filePath = xmlOutputDirectory + '/' + fileName
-			
-				os.system('xsltproc -o "' + filePath + '" "' + stylesheetPath + '" "' + inputDirectory + '/' + fileName + '"')
-				
-				# We will get values from the xml file
-				xmldoc = minidom.parse(filePath)
-			
-				# Get the object name
-				nameList = xmldoc.getElementsByTagName('name')
-				objectName = nameList[0].firstChild.data
-			
-				# Get the object type
-				objectList = xmldoc.getElementsByTagName('object')
-				objectType = objectList[0].attributes['kind'].value
-			
-				if objectType == 'class':
-					_mkdir(classPath)
-					finalPath = classPath
-				elif objectType == 'category':
-					_mkdir(categoryPath)
-					finalPath = categoryPath
-				elif objectType == 'protocol':
-					_mkdir(protocolPath)
-					finalPath = protocolPath
-				
-				objectName = objectName.replace('(', '_').replace(')', '')
-				
-				finalPath += '/' + objectName + '.xml'
-			
-				os.system('mv "' + filePath + '" "' + finalPath + '"')
-				
-				if shouldConvertToXHTML:
-					# Determine if there are any documented parts of this file
-					#paraList = xmldoc.getElementsByTagName('para')
-					#memberList = xmldoc.getElementsByTagName('member')
+	finalPath += '/' + objectName + '.xml'
 
-					# Only create an XHTML file if the file is documented
-					#if len(paraList) > 0 or len(memberList) > 0: <-- TODO: Only convert files which are documented
-					if 1:
-						xhtmlOutputDirectory = outputDirectory + '/DoxyCleaned/xhtml'
-						_mkdir(xhtmlOutputDirectory)
-						
-						
-						
-						# Set the path for different kinds of objects
-						classXHTMLPath = xhtmlOutputDirectory + '/Classes'
-						categoryXHTMLPath = xhtmlOutputDirectory + '/Categories'
-						protocolXHTMLPath = xhtmlOutputDirectory + '/Protocols'
-				
-						if objectType == 'class':
-							_mkdir(classXHTMLPath)
-							xhtmlPath = classXHTMLPath
-						elif objectType == 'category':
-							_mkdir(categoryXHTMLPath)
-							xhtmlPath = categoryXHTMLPath
-						elif objectType == 'protocol':
-							_mkdir(protocolXHTMLPath)
-							xhtmlPath = protocolXHTMLPath
-					
-						xhtmlPath += '/' + objectName + '.html'
-					
-						xhtmlStylesheetPath = sys.path[0] + '/object2xhtml.xslt'
-						os.system('xsltproc -o "' + xhtmlPath + '" "' + xhtmlStylesheetPath + '" "' + finalPath + '"')
+	os.system('mv "' + tempPath + '" "' + finalPath + '"')
 
+	return (objectName, objectType)
 	
+def convertToXHTML(objectName, objectType, inputDirectory, outputDirectory):
+	# Set the path for different kinds of objects
+	classXHTMLPath = xhtmlOutputDirectory + '/Classes'
+	categoryXHTMLPath = xhtmlOutputDirectory + '/Categories'
+	protocolXHTMLPath = xhtmlOutputDirectory + '/Protocols'
+
+	if objectType == 'class':
+		inputDirectory += '/Classes'
+		outputDirectory += '/Classes'
+	elif objectType == 'category':
+		inputDirectory += '/Categories'
+		outputDirectory += '/Categories'
+	elif objectType == 'protocol':
+		inputDirectory += '/Protocols'
+		outputDirectory += '/Protocols'
+	_mkdir(outputDirectory)
+
+	inputPath = inputDirectory + '/' + objectName + '.xml'
+	outputPath = outputDirectory + '/' + objectName + '.html'
+
+	stylesheetPath = sys.path[0] + '/object2xhtml.xslt'
+	os.system('xsltproc -o "' + outputPath + '" "' + stylesheetPath + '" "' + inputPath + '"')
+	
+def createIndexXML(inputDirectory):
 	# Create the index xml file
-	indexXMLPath = xmlOutputDirectory + '/index.xml'
+	outputPath = inputDirectory + '/index.xml'
 	indexXML = minidom.Document()
 	
 	projectElement = indexXML.createElement("project")
 	indexXML.appendChild(projectElement)
+	
+	# Define the various subdirectories
+	classPath = inputDirectory + '/Classes'
+	categoryPath = inputDirectory + '/Categories'
+	protocolPath = inputDirectory + '/Protocols'
 	
 	# Get each class
 	if os.path.exists(classPath):
@@ -261,18 +223,65 @@ if __name__ == '__main__':
 			nameElement.appendChild(nameText)
 	
 	# Write the index xml file
-	f = open(indexXMLPath, 'w')
+	f = open(outputPath, 'w')
 	indexXML.writexml(f, "", "\t", "\n")
 	f.close()
+	
+	return outputPath
+	
+def convertIndexToXHTML(xmlPath, outputDirectory):
+	# Copy the CSS files over to the new path
+	cssPath = sys.path[0] + '/css'
+	os.system('cp -R "' + cssPath + '" "' + outputDirectory + '"')
+	
+	# Create the index html file
+	stylesheetPath = sys.path[0] + '/index2xhtml.xslt'
+	outputPath = outputDirectory + '/index.html'
+	os.system('xsltproc -o "' + outputPath + '" "' + stylesheetPath + '" "' + xmlPath + '"')
+	
+	
+if __name__ == '__main__':	
+	# If no arguments are given, show the usage message
+	if len(sys.argv) == 1:
+		usage()
+		sys.exit(0)
+	
+	# Set the default directories
+	inputDirectory = os.getcwd()
+	outputDirectory = os.getcwd()
+	
+	shouldConvertToXHTML = 0
+	
+	opts, args = getopt.getopt(sys.argv[1:], 'i:o:h')
+	for option, value in opts:
+		if option[1] == 'i':
+			inputDirectory = value
+		elif option[1] == 'o':
+			outputDirectory = value
+		elif option[1] == 'h':
+			shouldConvertToXHTML = 1
+	
+	if not os.path.exists(inputDirectory):
+		print 'ERROR: Input path does not exist: ' + inputDirectory
+		sys.exit(1)
+		
+	_mkdir(outputDirectory)
+		
+	xmlOutputDirectory = outputDirectory + "/DoxyCleaned/xml"
+	xhtmlOutputDirectory = outputDirectory + '/DoxyCleaned/xhtml'
+		
+	for fileName in os.listdir(inputDirectory):
+		if fnmatch.fnmatch(fileName, 'interface_*.xml') or fnmatch.fnmatch(fileName, 'protocol_*.xml'):
+			
+			shouldConvert = fileIsDocumented(inputDirectory + '/' + fileName)
+
+			if shouldConvert:
+				(objectName, objectType) = cleanXML(fileName, inputDirectory, xmlOutputDirectory)
+				
+				if shouldConvertToXHTML:
+					convertToXHTML(objectName, objectType, xmlOutputDirectory, xhtmlOutputDirectory)
+	
+	indexPath = createIndexXML(xmlOutputDirectory)
 
 	if shouldConvertToXHTML:
-		# Copy the CSS files over to the new path
-		cssPath = sys.path[0] + '/styles'
-		os.system('cp -R "' + cssPath + '" "' + xhtmlOutputDirectory + '"')
-		
-		# Create the index html file
-		indexXHTMLStylesheetPath = sys.path[0] + '/index2xhtml.xslt'
-		indexXHTMLPath = xhtmlOutputDirectory + '/index.html'
-		os.system('xsltproc -o "' + indexXHTMLPath + '" "' + indexXHTMLStylesheetPath + '" "' + indexXMLPath + '"')
-	
-		
+		convertIndexToXHTML(indexPath, xhtmlOutputDirectory)

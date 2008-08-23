@@ -7,7 +7,7 @@
 		<head>
 			<title><xsl:apply-templates select="project" mode="title"/></title>
 			<meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8" />
-			<link rel="stylesheet" type="text/css" href="styles/screen.css" />
+			<link rel="stylesheet" type="text/css" href="css/screen.css" />
 			<meta name="generator" content="DoxyClean" />
 		</head>
 		<body>
