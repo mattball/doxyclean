@@ -47,6 +47,9 @@
 	</xsl:template>
 	
 	<xsl:template match="project" mode="title">
+		<xsl:if test="@name">
+			<xsl:value-of select="@name"/> 
+		</xsl:if>
 		Project Reference
 	</xsl:template>
 	
@@ -65,7 +68,7 @@
 							Protocols/
 						</xsl:when>
 					</xsl:choose>
-					<xsl:value-of select="translate(translate(name,'(','_'),')','')"/>
+					<xsl:value-of select="name"/>
 					.html
 				</xsl:attribute>
 				<xsl:value-of select="name"/>
