@@ -41,11 +41,6 @@ def usage ():
 	sys.exit(1)
 	
 def _mkdir(newdir):
-    """works the way a good mkdir should :)
-        - already exists, silently complete
-        - regular file in the way, raise an exception
-        - parent directory(ies) does not exist, make them as well
-    """
     if os.path.isdir(newdir):
         pass
     elif os.path.isfile(newdir):
@@ -77,14 +72,14 @@ def fileIsDocumented(filePath):
 
 	return 0
 
-def cleanXML(fileName, inputDirectory, outputDirectory):
+def cleanXML(filePath, outputDirectory):
 	_mkdir(outputDirectory)
 	
 	# Perform the XSL Transform
-	inputPath = inputDirectory + '/' + fileName
+	fileName = os.path.split(filePath)[1]
 	tempPath = outputDirectory + '/' + fileName
 	stylesheetPath = sys.path[0] + '/object.xslt'
-	os.system('xsltproc -o "' + tempPath + '" "' + stylesheetPath + '" "' + inputPath + '"')
+	os.system('xsltproc -o "' + tempPath + '" "' + stylesheetPath + '" "' + filePath + '"')
 
 	# We will get values from the xml file
 	xmldoc = minidom.parse(tempPath)
@@ -177,7 +172,7 @@ def createIndexXML(inputDirectory):
 	
 	return outputPath
 	
-def convertIndexToXHTML(xmlPath, outputDirectory):
+def convertIndexToXHTML(filePath, outputDirectory):
 	# Copy the CSS files over to the new path
 	cssPath = sys.path[0] + '/css'
 	os.system('cp -R "' + cssPath + '" "' + outputDirectory + '"')
@@ -185,7 +180,7 @@ def convertIndexToXHTML(xmlPath, outputDirectory):
 	# Create the index html file
 	stylesheetPath = sys.path[0] + '/index2xhtml.xslt'
 	outputPath = outputDirectory + '/index.html'
-	os.system('xsltproc -o "' + outputPath + '" "' + stylesheetPath + '" "' + xmlPath + '"')
+	os.system('xsltproc -o "' + outputPath + '" "' + stylesheetPath + '" "' + filePath + '"')
 	
 def linkify(inputDirectory):
 	indexFile = minidom.parse(inputDirectory + '/index.xml')
@@ -241,9 +236,9 @@ def linkify(inputDirectory):
 			f.write(fileXML.toxml())
 			f.close()
 			
-def insertProjectName(inputPath, projectName):
+def insertProjectName(inputDirectory, projectName):
 	# Get each file
-	for (path, dirs, files) in os.walk(inputPath):
+	for (path, dirs, files) in os.walk(inputDirectory):
 		for fileName in files:
 			filePath = path + '/' + fileName
 			
@@ -298,7 +293,7 @@ if __name__ == '__main__':
 			shouldConvert = fileIsDocumented(inputDirectory + '/' + fileName)
 
 			if shouldConvert:
-				(objectName, objectType) = cleanXML(fileName, inputDirectory, xmlOutputDirectory)
+				(objectName, objectType) = cleanXML(inputDirectory + '/' + fileName, xmlOutputDirectory)
 					
 	indexPath = createIndexXML(xmlOutputDirectory)
 	
