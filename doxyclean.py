@@ -195,8 +195,22 @@ def linkify(inputDirectory):
 			
 			filePath = path + '/' + fileName
 			
+			f = open(filePath, "r")
+			fileContents = f.read();
+			f.close();
+			
+			# Link to all Foundation and AppKit documentation
+			# We don't want links in the name or file
+			foundationPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(NSAppleEventDescriptor|NSNetService|NSAppleEventManager|NSNetServiceBrowser|NSAppleScript|NSNotification|NSArchiver|NSNotificationCenter|NSArray|NSNotificationQueue|NSAssertionHandler|NSNull|NSAttributedString|NSNumber|NSAutoreleasePool|NSNumberFormatter|NSBundle|NSObject|NSCachedURLResponse|NSOutputStream|NSCalendarDate|NSPipe|NSCharacterSet|NSPort|NSClassDescription|NSPortCoder|NSCloneCommand|NSPortMessage|NSCloseCommand|NSPortNameServer|NSCoder|NSPositionalSpecifier|NSConditionLock|NSProcessInfo|NSConnection|NSPropertyListSerialization|NSCountCommand|NSPropertySpecifier|NSCountedSet|NSProtocolChecker|NSCreateCommand|NSProxy|NSData|NSQuitCommand|NSDate|NSRandomSpecifier|NSDateFormatter|NSRangeSpecifier|NSDecimalNumber|NSRecursiveLock|NSDecimalNumberHandler|NSRelativeSpecifier|NSDeleteCommand|NSRunLoop|NSDeserializer|NSScanner|NSDictionary|NSScriptClassDescription|NSDirectoryEnumerator|NSScriptCoercionHandler|NSDistantObject|NSScriptCommand|NSDistantObjectRequest|NSScriptCommandDescription|NSDistributedLock|NSScriptExecutionContext|NSDistributedNotificationCenter|NSScriptObjectSpecifier|NSEnumerator|NSScriptSuiteRegistry|NSError|NSScriptWhoseTest|NSException|NSSerializer|NSExistsCommand|NSSet|NSFileHandle|NSSetCommand|NSFileManager|NSSocketPort|NSFormatter|NSSocketPortNameServer|NSGetCommand|NSSortDescriptor|NSHost|NSSpecifierTest|NSHTTPCookie|NSSpellServer|NSHTTPCookieStorage|NSStream|NSHTTPURLResponse|NSString|NSIndexSet|NSTask|NSIndexSpecifier|NSThread|NSInputStream|NSTimer|NSInvocation|NSTimeZone|NSKeyedArchiver|NSUnarchiver|NSKeyedUnarchiver|NSUndoManager|NSLock|NSUniqueIDSpecifier|NSLogicalTest|NSURL|NSMachBootstrapServer|NSURLAuthenticationChallenge|NSMachPort|NSURLCache|NSMessagePort|NSURLConnection|NSMessagePortNameServer|NSURLCredential|NSMethodSignature|NSURLCredentialStorage|NSMiddleSpecifier|NSURLDownload|NSMoveCommand|NSURLHandle|NSMutableArray|NSURLProtectionSpace|NSMutableAttributedString|NSURLProtocol|NSMutableCharacterSet|NSURLRequest|NSMutableData|NSURLResponse|NSMutableDictionary|NSUserDefaults|NSMutableIndexSet|NSValue|NSMutableSet|NSValueTransformer|NSMutableString|NSWhoseSpecifier|NSMutableURLRequest|NSXMLParser|NSNameSpecifier)"
+			fileContents = re.sub(foundationPattern, '\\1<ref id="http://developer.apple.com/documentation/Cocoa/Reference/Foundation/Classes/\\2_Class/index">\\2</ref>', fileContents)
+			
+			appKitPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(NSActionCell|NSOpenGLPixelFormat|NSAffineTransform|NSOpenGLView|NSAlert|NSOpenPanel|NSAppleScript Additions|NSOutlineView|NSApplication|NSPageLayout|NSArrayController|NSPanel|NSATSTypesetter|NSParagraphStyle|NSPasteboard|NSBezierPath|NSPDFImageRep|NSBitmapImageRep|NSPICTImageRep|NSBox|NSPopUpButton|NSBrowser|NSPopUpButtonCell|NSBrowserCell|NSPrinter|NSPrintInfo|NSButton|NSPrintOperation|NSButtonCell|NSPrintPanel|NSCachedImageRep|NSProgressIndicator|NSCell|NSQuickDrawView|NSClipView|NSResponder|NSRulerMarker|NSColor|NSRulerView|NSColorList|NSSavePanel|NSColorPanel|NSScreen|NSColorPicker|NSScroller|NSColorWell|NSScrollView|NSComboBox|NSSearchField|NSComboBoxCell|NSSearchFieldCell|NSControl|NSSecureTextField|NSController|NSSecureTextFieldCell|NSCursor|NSSegmentedCell|NSCustomImageRep|NSSegmentedControl|NSDocument|NSShadow|NSDocumentController|NSSimpleHorizontalTypesetter|NSDrawer|NSSlider|NSEPSImageRep|NSSliderCell|NSEvent|NSSound|NSFileWrapper|NSSpeechRecognizer|NSFont|NSSpeechSynthesizer|NSFontDescriptor|NSSpellChecker|NSFontManager|NSSplitView|NSFontPanel|NSStatusBar|NSForm|NSStatusItem|NSFormCell|NSStepper|NSGlyphGenerator|NSStepperCell|NSGlyphInfo|NSGraphicsContext|NSTableColumn|NSHelpManager|NSTableHeaderCell|NSImage|NSTableHeaderView|NSImageCell|NSTableView|NSImageRep|NSTabView|NSImageView|NSTabViewItem|NSInputManager|NSText|NSInputServer|NSTextAttachment|NSLayoutManager|NSTextAttachmentCell|NSMatrix|NSTextContainer|NSMenu|NSTextField|NSMenuItem|NSTextFieldCell|NSMenuItemCell|NSTextStorage|NSMenuView|NSTextTab|NSMovie|NSTextView|NSMovieView|NSToolbar|NSToolbarItem|NSMutableParagraphStyle|NSTypesetter|NSNib|NSNibConnector|NSUserDefaultsController|NSNibControlConnector|NSView|NSNibOutletConnector|NSWindow|NSObjectController|NSWindowController|NSOpenGLContext|NSWorkspace|NSOpenGLPixelBuffer)"
+			fileContents = re.sub(appKitPattern, '\\1<ref id="http://developer.apple.com/documentation/Cocoa/Reference/ApplicationKit/Classes/\\2_Class/index">\\2</ref>', fileContents)
+			
+		#	f.write(fileContents)
+			
 			# Get all the paragraphs in the file
-			fileXML = minidom.parse(filePath)
+			fileXML = minidom.parseString(fileContents)
 			fileType = fileXML.getElementsByTagName('object')[0].attributes['kind'].value
 			refNodes = fileXML.getElementsByTagName('ref')
 		
@@ -232,8 +246,9 @@ def linkify(inputDirectory):
 					node.parentNode.replaceChild(refText, node)
 				
 			# Write the xml file
-			f = open(filePath, 'w')
+			f = open(filePath, "w")
 			f.write(fileXML.toxml())
+		#	f.write(fileContents)
 			f.close()
 			
 def insertProjectName(inputDirectory, projectName):
