@@ -100,9 +100,6 @@ def cleanXML(filePath, outputDirectory):
 		finalPath = outputDirectory + '/Classes'
 	elif objectType == 'category':
 		finalPath = outputDirectory + '/Categories'
-
-		# Set the filename to something more URL-friendly
-		objectName = objectName.replace('(', '_').replace(')', '')
 	elif objectType == 'protocol':
 		finalPath = outputDirectory + '/Protocols'
 		
