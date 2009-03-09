@@ -211,7 +211,7 @@
 	
 	<!-- Overview -->
 	<xsl:template match="object/description">
-		<xsl:if test="brief[para] or details[para]">
+		<xsl:if test="brief or details">
 			<h2>Overview</h2>
 			<xsl:apply-templates select="brief"/>
 			<xsl:apply-templates select="details"/>

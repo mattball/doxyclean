@@ -6,7 +6,7 @@
 		<xsl:apply-templates select="doxygen/compounddef"/>
 	</xsl:template>
 	
-	<!-- General "Functions" -->
+	<!-- Formatters -->
 	<xsl:template name="filename">
 		<xsl:param name="path"/>
 		<xsl:choose>
@@ -21,31 +21,26 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<!-- Prototype -->
 	<xsl:template name="prototype">
-			<xsl:choose>
-				<xsl:when test="@kind='property'">@property <xsl:apply-templates select="type"/>
-						
-						<xsl:choose>
-							<xsl:when test="substring(type, string-length(type)-1, 2)=' *'">
-								
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:text> </xsl:text>
-							</xsl:otherwise>
-						</xsl:choose>
-						
-					<xsl:value-of select="name"/>
-				</xsl:when>
-				<xsl:when test="@kind='function'">
-					<xsl:choose>
-						<xsl:when test="@static='no'">- </xsl:when>
-						<xsl:when test="@static='yes'">+ </xsl:when>
-					</xsl:choose>(<xsl:apply-templates select="type"/>)<xsl:call-template name="prototypeWithArguments">
-						<xsl:with-param name="string" select="name"/>
-					</xsl:call-template>
-				</xsl:when>
-			</xsl:choose>
+		<xsl:choose>
+			<xsl:when test="@kind='property'">@property <xsl:apply-templates select="type"/>
+				<xsl:choose>
+					<xsl:when test="substring(type, string-length(type)-1, 2)=' *'"></xsl:when>
+					<xsl:otherwise>
+						<xsl:text> </xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>	
+				<xsl:value-of select="name"/>
+			</xsl:when>
+			<xsl:when test="@kind='function'">
+				<xsl:choose>
+					<xsl:when test="@static='no'">- </xsl:when>
+					<xsl:when test="@static='yes'">+ </xsl:when>
+				</xsl:choose>(<xsl:apply-templates select="type"/>)<xsl:call-template name="prototypeWithArguments">
+					<xsl:with-param name="string" select="name"/>
+				</xsl:call-template>
+			</xsl:when>
+		</xsl:choose>
 	</xsl:template>
 	<xsl:template name="prototypeWithArguments">
 		<xsl:param name="string"/>
@@ -64,8 +59,7 @@
 				<xsl:text> </xsl:text>
 				<xsl:call-template name="prototypeWithArguments">
 					<xsl:with-param name="string" select="substring-after($string,':')"/>
-				</xsl:call-template>
-					
+				</xsl:call-template>			
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="$string"/>
@@ -114,21 +108,8 @@
 	
 	
 	<!-- Basic Tags -->
-	<!--<xsl:template match="*">
-		<xsl:copy>
-			<xsl:copy-of select="@*" />
-			<xsl:apply-templates />
-		</xsl:copy>
-    </xsl:template>-->
-
 	<xsl:template match="ref">		
 		<ref>
-	    <!--  <xsl:attribute name="id">
-	        <xsl:value-of select="text()"/>
-	      </xsl:attribute>
-	      <xsl:attribute name="kind">
-	        <xsl:value-of select="@kindref"/>
-	      </xsl:attribute>-->
 	      <xsl:apply-templates/>
 	    </ref>
 	</xsl:template>
@@ -166,11 +147,14 @@
 				</xsl:call-template>
 			</file>
 			<xsl:apply-templates select="detaileddescription/para/simplesect[@kind='author']/para"/>
-			<description>
-				<xsl:apply-templates select="briefdescription"/>
-				<xsl:apply-templates select="detaileddescription"/>
-			</description>
-			<xsl:apply-templates select="detaileddescription/para" mode="seeAlso"/>
+			
+			<xsl:if test="briefdescription[para] or detaileddescription[para]">
+				<description>
+					<xsl:apply-templates select="briefdescription"/>
+					<xsl:apply-templates select="detaileddescription"/>
+				</description>
+				<xsl:apply-templates select="detaileddescription/para" mode="seeAlso"/>
+			</xsl:if>
 			<sections>
 				<xsl:apply-templates select="sectiondef"/>
 			</sections>
