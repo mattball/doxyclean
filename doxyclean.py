@@ -46,6 +46,10 @@ def _mkdir(newdir):
             os.mkdir(newdir)
 
 def fileIsDocumented(filePath):
+	# Only XML files can contain documentation information
+	if not os.path.splitext(filePath)[1] == ".xml":
+		return False
+	
 	# Check if the object is documented
 	originaldoc = minidom.parse(filePath)
 	briefList = originaldoc.getElementsByTagName('briefdescription')
@@ -64,10 +68,16 @@ def fileIsDocumented(filePath):
 	return False
 
 def nameForFile(filePath):
+	if not os.path.splitext(filePath)[1] == ".xml":
+		return None
+	
 	xmlDoc = minidom.parse(filePath)
 	return xmlDoc.getElementsByTagName("name")[0].firstChild.data
 
 def typeForFile(filePath):
+	if not os.path.splitext(filePath)[1] == ".xml":
+		return None
+		
 	xmlDoc = minidom.parse(filePath)
 	return xmlDoc.getElementsByTagName("object")[0].attributes["kind"].value
 
@@ -111,6 +121,10 @@ def createIndexXML(directory):
 	# Add one element per file
 	for (path, dirs, files) in os.walk(directory):
 		for fileName in files:
+			# Only look at XML files
+			if not os.path.splitext(fileName)[1] == ".xml":
+				continue
+			
 			# Get information about the file
 			filePath = os.path.join(path, fileName)
 			objectName = nameForFile(filePath)
@@ -141,8 +155,8 @@ def linkify(directory):
 	# Get each file
 	for (path, dirs, files) in os.walk(directory):
 		for fileName in files:
-			# Skip the index
-			if fileName == "index.xml":
+			# Skip the index and any non-xml files
+			if fileName == "index.xml" or not os.path.splitext(fileName)[1] == ".xml":
 				continue
 			
 			filePath = os.path.join(path, fileName)
