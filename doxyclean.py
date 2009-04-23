@@ -85,10 +85,15 @@ def cleanXML(filePath, outputDirectory):
 	if not fileIsDocumented(filePath):
 		return
 		
+	fileName = os.path.split(filePath)[1]
+		
+	global verbose
+	if verbose:
+		print "Cleaning " + fileName
+		
 	_mkdir(outputDirectory)
 	
 	# Perform the XSL Transform
-	fileName = os.path.split(filePath)[1]
 	tempPath = os.path.join(outputDirectory, fileName)
 	stylesheetPath = os.path.join(sys.path[0], "object.xslt")
 	os.system("xsltproc -o \"%s\" \"%s\" \"%s\"" % (tempPath, stylesheetPath, filePath))
@@ -152,6 +157,8 @@ def linkify(directory):
 	indexFile = minidom.parse(os.path.join(directory, "index.xml"))
 	documentedObjects = indexFile.getElementsByTagName("name")
 	
+	global verbose
+	
 	# Get each file
 	for (path, dirs, files) in os.walk(directory):
 		for fileName in files:
@@ -160,6 +167,9 @@ def linkify(directory):
 				continue
 			
 			filePath = os.path.join(path, fileName)
+			
+			if verbose:
+				print "Linkifying " + fileName
 			
 			f = open(filePath, "r")
 			fileContents = f.read()
@@ -217,9 +227,14 @@ def linkify(directory):
 			f.close()
 			
 def convertToHTML(filePath, outputDirectory):
+	global verbose
+	
 	# Get info about the object
 	objectName = nameForFile(filePath)
 	objectType = typeForFile(filePath)
+	
+	if verbose:
+		print "Converting " + objectName + ".html"
 	
 	if objectType == "class":
 		outputDirectory = os.path.join(outputDirectory, "Classes")
@@ -257,14 +272,22 @@ def main(argv=None):
 	if argv is None:
 		argv = sys.argv
 		
+	global verbose
+		
 	# Parse command line options
 	optionParser = OptionParser(version="%prog 1.0")
 	optionParser.add_option("-i", "--input", type="string", dest="inputDirectory", default=os.getcwd(), help="The directory containing Doxygen's XML output. Default is the current directory")
 	optionParser.add_option("-o", "--output", type="string", dest="outputDirectory", default=os.getcwd(), help="The directory to output the converted files to. Default is the current directory")
 	optionParser.add_option("-n", "--name", type="string", dest="projectName", default="Untitled", help="The name of the project")
 	optionParser.add_option("-x", "--xml", action="store_false", dest="makeHTML", default="True", help="Only generate XML. If this flag is not set, both XML and HTML will be generated")
+	optionParser.add_option("-v", "--verbose", action="store_true", dest="verbose", default="False", help="Show detailed information")
 	(options, args) = optionParser.parse_args(argv[1:])
 
+	verbose = options.verbose
+
+	if verbose:
+		print "Checking arguments"
+		
 	# Check the arguments
 	if not os.path.exists(options.inputDirectory):
 		print >>sys.stderr, "Error: Input path does not exist: %s" % (options.inputDirectory)
@@ -284,19 +307,28 @@ def main(argv=None):
 	xmlOutputDirectory = os.path.join(options.outputDirectory, "xml")
 		
 	# Clean up the XML files
+	if verbose:
+		print "Cleaning XML files:"
+	
 	for fileName in os.listdir(options.inputDirectory):
 		if fnmatch.fnmatch(fileName, "interface_*.xml") or fnmatch.fnmatch(fileName, "protocol_*.xml"):
 			filePath = os.path.join(options.inputDirectory, fileName)
 			cleanXML(filePath, xmlOutputDirectory)
 
 	# Create the index file
+	if verbose:
+		print "Creating index.xml"
 	indexPath = createIndexXML(xmlOutputDirectory)
 	
 	# Establish inter-file links
+	if verbose:
+		print "Establishing links:"
 	linkify(xmlOutputDirectory)
 	
 	# Convert to HTML
 	if options.makeHTML:
+		if verbose:
+			print "Converting to HTML:"
 		htmlOutputDirectory = os.path.join(options.outputDirectory, "html")
 		if (os.path.exists(os.path.join(xmlOutputDirectory, "Classes"))):
 			for fileName in os.listdir(os.path.join(xmlOutputDirectory, "Classes")):
@@ -310,13 +342,19 @@ def main(argv=None):
 			for fileName in os.listdir(os.path.join(xmlOutputDirectory, "Protocols")):
 				filePath = os.path.join(xmlOutputDirectory, "Protocols", fileName)
 				convertToHTML(filePath, htmlOutputDirectory)
+		if verbose:
+			print "Converting index.html"
 		convertIndexToHTML(indexPath, htmlOutputDirectory)
 		
+		if verbose:
+			print "Copying CSS stylesheets"
 		# Copy the CSS files over to the new path
 		cssPath = sys.path[0] + '/css'
 		os.system("cp -R \"%s\" \"%s\"" % (cssPath, htmlOutputDirectory))
 			
 	# Set the project name where necessary
+	if verbose:
+		print "Setting project name"
 	insertProjectName(xmlOutputDirectory, options.projectName)
 	if options.makeHTML:
 		insertProjectName(htmlOutputDirectory, options.projectName)
