@@ -245,10 +245,10 @@ def main(argv=None):
 		
 	# Parse command line options
 	optionParser = OptionParser(version="%prog 1.0")
-	optionParser.add_option("-i", "--input", type="string", dest="inputDirectory", default=os.getcwd(), help="The directory containing Doxygen's XML output")
-	optionParser.add_option("-o", "--output", type="string", dest="outputDirectory", default=os.getcwd(), help="The directory to output the converted files to")
+	optionParser.add_option("-i", "--input", type="string", dest="inputDirectory", default=os.getcwd(), help="The directory containing Doxygen's XML output. Default is the current directory")
+	optionParser.add_option("-o", "--output", type="string", dest="outputDirectory", default=os.getcwd(), help="The directory to output the converted files to. Default is the current directory")
 	optionParser.add_option("-n", "--name", type="string", dest="projectName", default="Untitled", help="The name of the project")
-	optionParser.add_option("-x", "--xml", action="store_false", dest="makeHTML", default="True", help="Only generate XML")
+	optionParser.add_option("-x", "--xml", action="store_false", dest="makeHTML", default="True", help="Only generate XML. If this flag is not set, both XML and HTML will be generated")
 	(options, args) = optionParser.parse_args(argv[1:])
 
 	# Check the arguments
