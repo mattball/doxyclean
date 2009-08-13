@@ -11,7 +11,7 @@
 			<meta name="generator" content="DoxyClean" />
 		</head>
 		<body>
-			<div id="mainContainer">
+			<div id="indexContainer">
 				<h1><a name="title" /><xsl:apply-templates select="project" mode="title"/></h1>
 				
 				<xsl:if test="count(project/object[@kind='class']) > 0">
