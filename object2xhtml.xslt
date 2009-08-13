@@ -10,7 +10,9 @@
 			<meta id="Generator" name="Generator" content="Doxyclean"/>
 			<meta id="GeneratorVersion" name="GeneratorVersion" content="v2.0"/>
 	
-			<link rel="stylesheet" type="text/css" media="screen" href="../css/screen.css" />
+			<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+			<link rel="stylesheet" type="text/css" media="screen" href="../css/screen.css"/>
+			<link rel="stylesheet" type="text/css" media="print" href="../css/print.css"/>
 	
 			<script type="text/javascript">
 				function toggleTOC() {
@@ -175,9 +177,7 @@
 	<xsl:template match="object/sections/section" mode="toc">
 		<li>
 			<a>
-				<xsl:attribute name="href">
-					#<xsl:value-of select="translate(normalize-space(name), ' ', '_')"/>
-				</xsl:attribute>
+				<xsl:attribute name="href">#<xsl:value-of select="translate(normalize-space(name), ' ', '_')"/></xsl:attribute>
 				<xsl:apply-templates select="name"/>
 			</a>
 		</li>
@@ -252,7 +252,7 @@
 		<xsl:if test="count(section) > 0">
 			<a name="tasks"/>
 			<h2>Tasks</h2>
-			<ul id="tasks">
+			<ul id="tasksList">
 				<xsl:apply-templates selection="section"/>
 			</ul>
 		</xsl:if>

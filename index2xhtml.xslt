@@ -7,8 +7,13 @@
 		<head>
 			<title><xsl:apply-templates select="project" mode="title"/></title>
 			<meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8" />
-			<link rel="stylesheet" type="text/css" href="css/screen.css" />
-			<meta name="generator" content="DoxyClean" />
+			
+			<meta id="Generator" name="Generator" content="Doxyclean"/>
+			<meta id="GeneratorVersion" name="GeneratorVersion" content="v2.0"/>
+			
+			<link rel="stylesheet" type="text/css" href="css/common.css"/>
+			<link rel="stylesheet" type="text/css" media="screen" href="css/screen.css"/>
+			<link rel="stylesheet" type="text/css" media="print" href="css/print.css"/>
 		</head>
 		<body>
 			<div id="indexContainer">
