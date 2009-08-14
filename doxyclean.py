@@ -246,12 +246,12 @@ def convertToHTML(filePath, outputDirectory):
 	
 	outputPath = os.path.join(outputDirectory, objectName + ".html")
 	
-	stylesheetPath = sys.path[0] + '/object2xhtml.xslt'
+	stylesheetPath = sys.path[0] + '/object2html.xslt'
 	os.system("xsltproc -o \"%s\" \"%s\" \"%s\"" % (outputPath, stylesheetPath, filePath))
 
 def convertIndexToHTML(filePath, outputDirectory):
 	# Create the index html file
-	stylesheetPath = sys.path[0] + '/index2xhtml.xslt'
+	stylesheetPath = sys.path[0] + '/index2html.xslt'
 	outputPath = outputDirectory + '/index.html'
 	os.system("xsltproc -o \"%s\" \"%s\" \"%s\"" % (outputPath, stylesheetPath, filePath))
 

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" exclude-result-prefixes="xhtml">
-	<xsl:output method="xml" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" doctype-public="-//W3C//DTD XHTML 1.0 STRICT//EN" indent="yes" />
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+	<xsl:output method="html" omit-xml-declaration="yes" indent="yes" />
 	
 	<xsl:template match="/">
-		<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+		<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
+		<html>
 		<head>
+			<meta charset="UTF-8" />
 			<title><xsl:apply-templates select="project" mode="title"/></title>
-			<meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8" />
 			
 			<meta id="Generator" name="Generator" content="Doxyclean"/>
 			<meta id="GeneratorVersion" name="GeneratorVersion" content="v2.0"/>
@@ -17,7 +18,7 @@
 		</head>
 		<body>
 			<div id="indexContainer">
-				<h1><a name="title" /><xsl:apply-templates select="project" mode="title"/></h1>
+				<h1><xsl:apply-templates select="project" mode="title"/></h1>
 				
 				<xsl:if test="count(project/object[@kind='class']) > 0">
 					<div class="column">
@@ -44,8 +45,6 @@
 					</xsl:if>
 				</div>
 				
-				<div class="clear"></div>
-				
 			</div>
 		</body>
 		</html>
@@ -63,20 +62,11 @@
 			<a>
 				<xsl:attribute name="href">
 					<xsl:choose>
-						<xsl:when test="@kind='class'">
-							Classes/
-						</xsl:when>
-						<xsl:when test="@kind='category'">
-							Categories/
-						</xsl:when>
-						<xsl:when test="@kind='protocol'">
-							Protocols/
-						</xsl:when>
+						<xsl:when test="@kind='class'">Classes/</xsl:when>
+						<xsl:when test="@kind='category'">Categories/</xsl:when>
+						<xsl:when test="@kind='protocol'">Protocols/</xsl:when>
 					</xsl:choose>
-					<xsl:value-of select="name"/>
-					.html
-				</xsl:attribute>
-				<xsl:value-of select="name"/>
+					<xsl:value-of select="normalize-space(name)"/>.html</xsl:attribute><xsl:value-of select="normalize-space(name)"/>
 			</a>
 		</li>
 	</xsl:template>
