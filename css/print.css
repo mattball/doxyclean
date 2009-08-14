@@ -1,15 +1,11 @@
-#title {
-	display: none;
+header {
+	display: none !important;
 }
 
-ul#buttons {
-	display: none;
+nav {
+	display: none !important;
 }
 
-ul#tableOfContents {
-	display: none;
-}
-
-ul#breadcrumbs {
-	display: none;
+footer {
+	display: none !important;
 }

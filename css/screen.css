@@ -2,7 +2,7 @@
 /* ---------->>>> =Header <<<<----------*/
 /* -------------------------------------*/
 
-#title {
+header {
 	background: -webkit-gradient(linear, left top, left bottom, from(#bcc6d0), to(#8a98a9));
 	border-width: 0 0 1px 0;
 	border-style: solid;
@@ -14,14 +14,14 @@
 	right: 0;
 }
 
-#title h1 {
+header h1 {
 	font-size: 1.0em;
 	color: #000;
 	text-shadow: #bcc6d0 0 1px 0;
 	padding: 0.5em 1.0em;
 }
 
-ul#buttons {
+#buttons ul {
 	background-color: #d8d8d8;
 	border-width: 1px 0;
 	border-style: solid;
@@ -36,11 +36,11 @@ ul#buttons {
 	
 }
 
-ul#buttons li {
+#buttons ul li {
 	float: left;
 }
 
-ul#buttons li#toc_button button {
+#buttons ul li#toc_button button {
 	border: 0;
 	background: none;
 	text-align: left;
@@ -51,7 +51,7 @@ ul#buttons li#toc_button button {
 	color: #000;
 }
 
-ul#buttons li#toc_button button:before {
+#buttons ul li#toc_button button:before {
 	content: "\25B6";
 	font-size: 7px;
 	padding: 0.5em 0.8em 0.6em 0.4em;
@@ -60,20 +60,20 @@ ul#buttons li#toc_button button:before {
 	color: #434343;
 }
 
-ul#buttons li#toc_button button:hover:before {
+#buttons ul li#toc_button button:hover:before {
 	color: #fff;
 }
 
-ul#buttons li#toc_button.open button:before {
+#buttons ul li#toc_button.open button:before {
 	content: "\25BC";
 }
 
-ul#buttons li#toc_button button:hover {
+#buttons ul li#toc_button button:hover {
 	background-color: #787878;
 	color: #fff;
 }
 
-ul#buttons li#toc_button button:active {
+#buttons ul li#toc_button button:active {
 	background-color: #4f4f4f;
 	color: #fff;
 }
@@ -88,8 +88,7 @@ select {
 /* ---->>>> =Table of Contents <<<<-----*/
 /* -------------------------------------*/
 
-ul#tableOfContents {
-	list-style: none;
+#tableOfContents {
 	background-color: #e4ebf7;
 	border-right: 1px solid #acacac;
 	padding-top: 0.5em;
@@ -101,55 +100,59 @@ ul#tableOfContents {
 	overflow: auto;
 }
 
-ul#tableOfContents li {
+#tableOfContents ul {
+	list-style: none;
+}
+
+#tableOfContents ul li {
 	padding: 0.5em 0.8em 0.2em 0.4em;
 	font-size: 0.9em;
 	font-weight: bold;
 	margin-left: 14px;
 }
 
-ul#tableOfContents li:before {
+#tableOfContents ul li:before {
 	display: block;
 	float: left;
 	content: "";
 	margin-left: -10px;
 }
 
-ul#tableOfContents li.expandable {
+#tableOfContents ul li.expandable {
 	margin-left: 10px;
 }
 
-ul#tableOfContents li.expandable:before {
+#tableOfContents ul li.expandable:before {
 	content: "\25B6";
 	font-size: 7px;
 	color: #434343;
 	padding: 0.5em 6px 0.6em 0.3em;
 }
 
-ul#tableOfContents li.expandable.expanded:before {
+#tableOfContents ul li.expandable.expanded:before {
 	content: "\25BC";
 }
 
-ul#tableOfContents ul {
+#tableOfContents ul ul {
 	list-style: none;
 	margin-top: 0.2em;
 }
 
-ul#tableOfContents ul li {
+#tableOfContents ul ul li {
 	font-size: 1.0em;
 	margin-left: 2px;
 }
 
-ul#tableOfContents li a {
+#tableOfContents ul li a {
 	color: #000000;
 	text-decoration: none;
 }
 
-ul#tableOfContents li a:hover {
+#tableOfContents ul li a:hover {
 	text-decoration: underline;
 }
 
-ul#tableOfContents ul li a {
+#tableOfContents ul ul li a {
 	color: #4f4f4f;
 }
 
@@ -174,7 +177,7 @@ ul#tableOfContents ul li a {
 /* ------->>>> =Breadcrumbs <<<<--------*/
 /* -------------------------------------*/
 
-ul#breadcrumbs {
+footer {
 	background: -webkit-gradient(linear, left top, left bottom, from(#bcc6d0), to(#8a98a9));
 	border-width: 1px 0 0 0;
 	border-style: solid;
@@ -184,11 +187,13 @@ ul#breadcrumbs {
 	bottom: 0;
 	left: 0;
 	width: 100%;
-	
+}
+
+footer ul {
 	list-style: none;
 }
 
-ul#breadcrumbs li:before {
+footer ul li:before {
 	content: "\25B6";
 	font-size: 7px;
 	float: left;
@@ -196,21 +201,21 @@ ul#breadcrumbs li:before {
 	color: #434343;
 }
 
-ul#breadcrumbs li:first-child:before {
+footer ul li:first-child:before {
 	content: "";
 }
 
-ul#breadcrumbs li {
+footer ul li {
 	float: left;
 	font-size: 10px;
 	margin: 3px 0;
 }
 
-ul#breadcrumbs a {
+footer ul a {
 	color: #000;
 	text-decoration: none;
 }
 
-ul#breadcrumbs a:hover {
+footer ul a:hover {
 	text-decoration: underline;
 }

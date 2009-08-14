@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:date="http://exslt.org/dates-and-times" version="1.0" exclude-result-prefixes="xhtml" extension-element-prefixes="date">
-	<xsl:output method="html" omit-xml-declaration="yes" indent="yes" doctype-public="XSLT-compat" />
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:date="http://exslt.org/dates-and-times" version="1.0" extension-element-prefixes="date">
+	<xsl:output method="html" omit-xml-declaration="yes" indent="yes" />
 	
 	<xsl:template match="/">
+		<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
 		<html>
 		<head>
 			<meta charset="UTF-8" />
@@ -49,9 +50,11 @@
 			</script>
 		</head>
 		<body>
-			<div id="header">
-				<div id="title"><h1><xsl:apply-templates select="object" mode="title"/></h1></div>
-				<ul id="buttons">
+			<header>
+				<h1><xsl:apply-templates select="object" mode="title"/></h1>
+			</header>
+			<nav id="buttons">
+				<ul>
 					<li id="toc_button"><button id="table_of_contents" onclick="toggleTOC()">Table of Contents</button></li>
 					<li id="jumpto_button">
 						<select id="jumpto" onchange="jumpTo()">
@@ -64,18 +67,20 @@
 						</select>
 					</li>
 				</ul>
-			</div>	
+			</nav>	
 
-			<ul id="tableOfContents" style="display: none;">
-				<xsl:apply-templates select="object/description" mode="toc"/>
-				<xsl:apply-templates select="object/sections" mode="toc"/>
-				<xsl:call-template name="TOCproperties"/>
-				<xsl:call-template name="TOCclassMethods"/>
-				<xsl:call-template name="TOCinstanceMethods"/>
-			</ul>
+			<nav id="tableOfContents" style="display: none;">
+				<ul>
+					<xsl:apply-templates select="object/description" mode="toc"/>
+					<xsl:apply-templates select="object/sections" mode="toc"/>
+					<xsl:call-template name="TOCproperties"/>
+					<xsl:call-template name="TOCclassMethods"/>
+					<xsl:call-template name="TOCinstanceMethods"/>
+				</ul>
+			</nav>
 			
 			<div id="contents">
-				<h1><a name="classTitle"/><xsl:apply-templates select="object" mode="title"/></h1>
+				<h1 id="classTitle"><xsl:apply-templates select="object" mode="title"/></h1>
 				
 				<!-- Info Table -->
 				<table id="metadata">
@@ -95,16 +100,15 @@
 				<xsl:call-template name="instanceMethods"/>
 				
 				<hr/>
-				<p id="lastUpdated">
-					Last updated: <xsl:value-of select="date:year()"/>-<xsl:value-of select="date:month-in-year()"/>-<xsl:value-of select="date:day-in-month()"/>
-				</p>
-				
+				<p id="lastUpdated">Last updated: <xsl:value-of select="date:year()"/>-<xsl:value-of select="date:month-in-year()"/>-<xsl:value-of select="date:day-in-month()"/></p>		
 			</div>
 			
-			<ul id="breadcrumbs">
-				<li><a href="../index.html">##PROJECT##</a></li>
-				<li><a href="#classTitle"><xsl:apply-templates select="object" mode="title"/></a></li>
-			</ul>
+			<footer id="breadcrumbs">
+				<ul>
+					<li><a href="../index.html">##PROJECT##</a></li>
+					<li><a href="#classTitle"><xsl:apply-templates select="object" mode="title"/></a></li>
+				</ul>
+			</footer>
 	
 		</body>
 		</html>
@@ -240,8 +244,7 @@
 	<!-- Overview -->
 	<xsl:template match="object/description">
 		<xsl:if test="brief or details">
-			<a name="overview"/>
-			<h2>Overview</h2>
+			<h2 id="overview">Overview</h2>
 			<xsl:apply-templates select="brief"/>
 			<xsl:apply-templates select="details"/>
 		</xsl:if>
@@ -250,8 +253,7 @@
 	<!-- Sections -->
 	<xsl:template match="sections">
 		<xsl:if test="count(section) > 0">
-			<a name="tasks"/>
-			<h2>Tasks</h2>
+			<h2 id="tasks">Tasks</h2>
 			<ul id="tasksList">
 				<xsl:apply-templates selection="section"/>
 			</ul>
@@ -260,15 +262,11 @@
 	
 	<xsl:template match="section">
 		<xsl:if test="count(member) > 0">
-			<li> 
-				<h3>
-					<a>
-						<xsl:attribute name="name">
-							<xsl:value-of select="translate(normalize-space(name), ' ', '_')"/>
-						</xsl:attribute>
-					</a>
-					<xsl:apply-templates select="name"/>
-				</h3>
+			<li>
+				<xsl:attribute name="id">
+					<xsl:value-of select="translate(normalize-space(name), ' ', '_')"/>
+				</xsl:attribute>
+				<h3><xsl:apply-templates select="name"/></h3>
 				<ul class="methods">
 					<xsl:apply-templates select="member" mode="index"/>
 				</ul>
@@ -304,34 +302,36 @@
 	<!-- Definition Sections -->
 	<xsl:template name="properties">
 		<xsl:if test="count(object/sections/section/member[@kind='property']) > 0">
-			<h2><a name="properties"/>Properties</h2>
-			<xsl:apply-templates select="object/sections/section/member[@kind='property']" mode="details"/>
+			<section id="properties">
+				<h2>Properties</h2>
+				<xsl:apply-templates select="object/sections/section/member[@kind='property']" mode="details"/>
+			</section>
 		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template name="classMethods">
 		<xsl:if test="count(object/sections/section/member[@kind='class-method']) > 0">
-			<h2><a name="classMethods"/>Class Methods</h2>
-			<xsl:apply-templates select="object/sections/section/member[@kind='class-method']" mode="details"/>
+			<section id="classMethods">
+				<h2>Class Methods</h2>
+				<xsl:apply-templates select="object/sections/section/member[@kind='class-method']" mode="details"/>
+			</section>
 		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template name="instanceMethods">
 		<xsl:if test="count(object/sections/section/member[@kind='instance-method']) > 0">
-			<h2><a name="instanceMethods"/>Instance Methods</h2>
-			<xsl:apply-templates select="object/sections/section/member[@kind='instance-method']" mode="details"/>
+			<section id="instanceMethods">
+				<h2>Instance Methods</h2>
+				<xsl:apply-templates select="object/sections/section/member[@kind='instance-method']" mode="details"/>
+			</section>
 		</xsl:if>
 	</xsl:template>
 	
 	<!-- Method/Property Documentation -->
 	<xsl:template match="member" mode="details">
-		<div class="definition">
-			<h3>
-				<a>
-					<xsl:attribute name="name"><xsl:value-of select="name"/></xsl:attribute>
-				</a>
-				<xsl:value-of select="name"/>
-			</h3>
+		<section class="definition">
+			<xsl:attribute name="id"><xsl:value-of select="name"/></xsl:attribute>
+			<h3><xsl:value-of select="name"/></h3>
 			
 			<xsl:apply-templates select="description/brief"/>
 			
@@ -347,7 +347,7 @@
 			<xsl:apply-templates select="seeAlso"/>
 			<xsl:apply-templates select="file"/>
 			
-		</div>
+		</section>
 	</xsl:template>
 	
 	<xsl:template match="prototype">
@@ -456,6 +456,4 @@
 		</code>
 	</xsl:template>
 	
-	
-
 </xsl:stylesheet>
