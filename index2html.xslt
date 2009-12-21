@@ -10,7 +10,7 @@
 			<title><xsl:apply-templates select="project" mode="title"/></title>
 			
 			<meta id="Generator" name="Generator" content="Doxyclean"/>
-			<meta id="GeneratorVersion" name="GeneratorVersion" content="v2.0"/>
+			<meta id="GeneratorVersion" name="GeneratorVersion" content="2.1"/>
 			
 			<link rel="stylesheet" type="text/css" href="css/common.css"/>
 			<link rel="stylesheet" type="text/css" media="screen" href="css/screen.css"/>
