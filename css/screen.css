@@ -2,8 +2,8 @@
 /* ---------->>>> =Header <<<<----------*/
 /* -------------------------------------*/
 
-header {
-	background: -webkit-gradient(linear, left top, left bottom, from(#bcc6d0), to(#8a98a9));
+header#projectHeader {
+	background: -webkit-gradient(linear, left top, left bottom, from(#576a7d), to(#33393f));
 	border-width: 0 0 1px 0;
 	border-style: solid;
 	border-color: #a1adbb;
@@ -12,28 +12,65 @@ header {
 	top: 0;
 	left: 0;
 	right: 0;
+	height: 35px;
 }
 
-header h1 {
-	font-size: 1.0em;
+header#projectHeader h1 {
+	font-size: 1.4em;
+	font-family: Helvetica, sans-serif;
+	color: #eee;
+	text-shadow: #000 0 0 4px;
+	padding: 0.4em 1.0em;
+	text-align: left;
+	font-weight: normal;
+}
+
+header#projectHeader h1 a,
+header#projectHeader h1 a:hover {
+	color: #eee;
+	text-decoration: none;
+}
+
+header#fileHeader {
+	background: -webkit-gradient(linear, left top, left bottom, from(#bcc6d0), to(#8a98a9));
+	border-width: 0 0 1px 0;
+	border-style: solid;
+	border-color: #a1adbb;
+
+	position: absolute;
+	top: 35px;
+	left: 0;
+	right: 0;
+	height: 25px;
+}
+
+header#fileHeader h1 {
+	font-size: 1.2em;
 	color: #000;
-	text-shadow: #bcc6d0 0 1px 0;
-	padding: 0.5em 1.0em;
+	text-shadow: #c3c3c3 0 1px 0;
+	padding: 0.3em 1.0em;
+	text-align: center;
+	font-weight: normal;
+}
+
+header#fileHeader h1 a,
+header#fileHeader h1 a:hover {
+	color: #000;
+	text-decoration: none;
 }
 
 #buttons ul {
-	background-color: #d8d8d8;
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #fff), color-stop(0.5, #f1f1f1), color-stop(0.5, #ececec), color-stop(1.0, #d6d6d6));
 	border-width: 1px 0;
 	border-style: solid;
 	border-color: #2b334f;
-	height: 21px;
+	height: 29px;
 	list-style: none;
 	
 	position: absolute;
-	top: 26px;
+	top: 61px;
 	left: 0;
 	right: 0;
-	
 }
 
 #buttons ul li {
@@ -45,7 +82,7 @@ header h1 {
 	background: none;
 	text-align: left;
 	padding: 2px 0.4em 0 0.4em;
-	height: 21px;
+	height: 29px;
 	width: 230px;
 	border-right: 1px solid #acacac;
 	color: #000;
@@ -60,28 +97,13 @@ header h1 {
 	color: #434343;
 }
 
-#buttons ul li#toc_button button:hover:before {
-	color: #fff;
-}
-
 #buttons ul li#toc_button.open button:before {
 	content: "\25BC";
 }
 
-#buttons ul li#toc_button button:hover {
-	background-color: #787878;
-	color: #fff;
-}
-
-#buttons ul li#toc_button button:active {
-	background-color: #4f4f4f;
-	color: #fff;
-}
-
 select {
-	border: none;
-	height: 20px;
-	background: none;
+	margin-top: 5px;
+	margin-left: 8px;
 }
 
 /* -------------------------------------*/
@@ -94,7 +116,7 @@ select {
 	padding-top: 0.5em;
 	width: 229px;
 	position: absolute;
-	top: 49px;
+	top: 92px;
 	bottom: 19px;
 	left: 0;
 	overflow: auto;
@@ -162,7 +184,7 @@ select {
 
 #contents {
 	position: absolute;
-	top: 49px;
+	top: 92px;
 	bottom: 19px;
 	overflow: auto;
 	left: 0;

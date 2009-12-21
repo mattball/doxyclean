@@ -50,8 +50,11 @@
 			</script>
 		</head>
 		<body>
-			<header>
-				<h1><xsl:apply-templates select="object" mode="title"/></h1>
+			<header id="projectHeader">
+				<h1><a href="../index.html">##PROJECT## Reference Library</a></h1>
+			</header>
+			<header id="fileHeader">
+				<h1><a href="#classTitle"><xsl:apply-templates select="object" mode="title"/></a></h1>
 			</header>
 			<nav id="buttons">
 				<ul>

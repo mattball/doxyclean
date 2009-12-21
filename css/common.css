@@ -216,6 +216,7 @@ ul.methods li span.tooltipRegion:hover span.tooltip {
 
 .column h5 {
 	border-bottom: 1px solid #aaa;
+	margin-top: 2.0em;
 	}
 
 .column ul {
