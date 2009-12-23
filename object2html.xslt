@@ -449,7 +449,7 @@
 	<xsl:template match="ref">
 		<code>
 			<xsl:choose>
-				<xsl:when test="/object/name != @id">
+				<xsl:when test="/object/name != child::node()[1]">
 					<a>
 						<xsl:attribute name="href"><xsl:value-of select="@id"/>.html</xsl:attribute>
 						<xsl:apply-templates/>
