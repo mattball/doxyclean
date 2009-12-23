@@ -175,6 +175,10 @@ def linkify(directory):
 			fileContents = f.read()
 			f.close()
 			
+			# Remove all refs initially
+			# We will recreate them ourselves
+			fileContents = re.sub("\\<ref(?: .*)?\\>(.*?)\\</ref\\>", "\\1", fileContents);
+			
 			# Link to all Foundation and AppKit documentation
 			# We don't want links in the name or file
 			macFoundationClassesPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(NSMetadataQueryAttributeValueTuple|NSDistributedNotificationCenter|NSURLAuthenticationChallenge|NSPropertyListSerialization|NSScriptCommandDescription|NSMetadataQueryResultGroup|NSMutableAttributedString|NSScriptExecutionContext|NSScriptClassDescription|NSScriptObjectSpecifier|NSScriptCoercionHandler|NSMessagePortNameServer|NSURLCredentialStorage|NSSocketPortNameServer|NSDistantObjectRequest|NSDecimalNumberHandler|NSAppleEventDescriptor|NSScriptSuiteRegistry|NSPositionalSpecifier|NSMutableCharacterSet|NSMachBootstrapServer|NSInvocationOperation|NSDirectoryEnumerator|NSComparisonPredicate|NSURLProtectionSpace|NSTextCheckingResult|NSNotificationCenter|NSUniqueIDSpecifier|NSRelativeSpecifier|NSPropertySpecifier|NSNotificationQueue|NSNetServiceBrowser|NSMutableURLRequest|NSMutableDictionary|NSHTTPCookieStorage|NSCompoundPredicate|NSCachedURLResponse|NSAppleEventManager|NSValueTransformer|NSPointerFunctions|NSGarbageCollector|NSClassDescription|NSAttributedString|NSAssertionHandler|NSScriptWhoseTest|NSRandomSpecifier|NSProtocolChecker|NSNumberFormatter|NSMutableIndexSet|NSMiddleSpecifier|NSMethodSignature|NSKeyedUnarchiver|NSHTTPURLResponse|NSDistributedLock|NSAutoreleasePool|NSAffineTransform|NSWhoseSpecifier|NSSortDescriptor|NSRangeSpecifier|NSPortNameServer|NSOperationQueue|NSIndexSpecifier|NSDateComponents|NSBlockOperation|NSURLCredential|NSURLConnection|NSSpecifierTest|NSScriptCommand|NSRecursiveLock|NSNameSpecifier|NSMutableString|NSMetadataQuery|NSKeyedArchiver|NSExistsCommand|NSDistantObject|NSDeleteCommand|NSDecimalNumber|NSDateFormatter|NSCreateCommand|NSConditionLock|NSUserDefaults|NSPointerArray|NSOutputStream|NSNotification|NSMutableArray|NSMetadataItem|NSDeserializer|NSCountCommand|NSCloseCommand|NSCloneCommand|NSCharacterSet|NSXMLDocument|NSUndoManager|NSURLResponse|NSURLProtocol|NSURLDownload|NSSpellServer|NSQuitCommand|NSProcessInfo|NSPortMessage|NSOrthography|NSMutableData|NSMoveCommand|NSMessagePort|NSLogicalTest|NSInputStream|NSFileManager|NSAppleScript|NSXMLElement|NSXMLDTDNode|NSUnarchiver|NSURLRequest|NSSocketPort|NSSetCommand|NSSerializer|NSNetService|NSMutableSet|NSInvocation|NSHTTPCookie|NSGetCommand|NSFileHandle|NSExpression|NSEnumerator|NSDictionary|NSCountedSet|NSConnection|NSXMLParser|NSURLHandle|NSPredicate|NSPortCoder|NSOperation|NSIndexPath|NSHashTable|NSFormatter|NSException|NSCondition|NSURLCache|NSTimeZone|NSMapTable|NSMachPort|NSIndexSet|NSCalendar|NSArchiver|NSXMLNode|NSScanner|NSRunLoop|NSXMLDTD|NSThread|NSString|NSStream|NSObject|NSNumber|NSLocale|NSBundle|NSValue|NSTimer|NSProxy|NSError|NSCoder|NSArray|NSTask|NSPort|NSPipe|NSNull|NSLock|NSHost|NSDate|NSData|NSURL|NSSet)"
@@ -220,47 +224,36 @@ def linkify(directory):
 			iphoneUIKitProtocolsPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(UIVideoEditorControllerDelegate|UIImagePickerControllerDelegate|UIResponderStandardEditActions|UINavigationControllerDelegate|UITabBarControllerDelegate|UIAccessibilityContainer|UISearchDisplayDelegate|UINavigationBarDelegate|UIAccelerometerDelegate|UIPickerViewDataSource|UITableViewDataSource|UIApplicationDelegate|UIActionSheetDelegate|UIScrollViewDelegate|UIPickerViewDelegate|UITextFieldDelegate|UITableViewDelegate|UISearchBarDelegate|UIAlertViewDelegate|UITextViewDelegate|UIWebViewDelegate|UITextInputTraits|UITabBarDelegate|UIAccessibility)"
 			fileContents = re.sub(iphoneUIKitProtocolsPattern, '\\1<ref id="http://developer.apple.com/iphone/library/documentation/UIKit/Reference/\\2_Protocol/index">\\2</ref>', fileContents)
 			
-			# Get all the paragraphs in the file
-			fileXML = minidom.parseString(fileContents)
-			fileType = typeForFile(filePath)
-			refNodes = fileXML.getElementsByTagName("ref")
+			# Establish links to all files in the project
+			classesList = []
+			categoriesList = []
+			protocolsList = []
 			
-			# Replace all instances of the current object with a <ref>
-			for node in refNodes:
-				refName = node.firstChild.data
+			for documentedObject in documentedObjects:
+				# We need to get rid of whitespace
+				# (It's a "feature" of minidom)
+				objectName = documentedObject.firstChild.data.replace("\n", "").replace("\t", "")
+				objectType = documentedObject.parentNode.attributes["kind"].value
 				
-				# Search for the corresponding node in the index
-				for documentedObject in documentedObjects:
-					# We need to get rid of whitespace
-					# (It's a "feature" of minidom)
-					objectName = documentedObject.firstChild.data.replace("\n", "").replace("\t", "")
+				if objectType == "class":
+					classesList.append(objectName)
+				elif objectType == "category":
+					categoriesList.append(objectName)
+				elif objectType == "protocol":
+					protocolsList.append(objectName)
 					
-					if objectName == refName:
-						objectType = documentedObject.parentNode.attributes["kind"].value
-						objectPath = ""
-						
-						# Determine the proper directory
-						if fileType != objectType:
-							if objectType == "class":
-								objectPath += "../Classes"
-							elif objectType == "category":
-								objectPath += "../Categories"
-							elif objectType == "protocol":
-								objectPath += "../Protocols"
-								
-						objectPath = os.path.join(objectPath, refName)
-						node.setAttribute("id", objectPath)
-						break
-				
-				# Check if the ref has a "id" attribute
-				# If not, remove the <ref>
-				if not node.hasAttribute("id"):
-					refText = fileXML.createTextNode(refName)
-					node.parentNode.replaceChild(refText, node)
-					
+			projectClassesPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(" + '|'.join(classesList) + ")"
+			fileContents = re.sub(projectClassesPattern, '\\1<ref id="../Classes/\\2">\\2</ref>', fileContents)
+			
+			projectCategoriesPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(" + '|'.join(categoriesList) + ")"
+			fileContents = re.sub(projectCategoriesPattern, '\\1<ref id="../Categories/\\2">\\2</ref>', fileContents)
+			
+			projectProtocolsPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(" + '|'.join(protocolsList) + ")"
+			fileContents = re.sub(projectProtocolsPattern, '\\1<ref id="../Protocols/\\2">\\2</ref>', fileContents)
+			
 			# Write the xml file
 			f = open(filePath, "w")
-			f.write(fileXML.toxml())			
+			f.write(fileContents)			
 			f.close()
 			
 def convertToHTML(filePath, outputDirectory):
