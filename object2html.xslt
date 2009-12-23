@@ -295,6 +295,9 @@
 					<xsl:when test="@kind='property'">
 						<xsl:text> </xsl:text><span class="specialType">property</span>
 					</xsl:when>
+					<xsl:when test="@optional='no'">
+						<xsl:text> </xsl:text><span class="specialType">required</span>
+					</xsl:when>
 				</xsl:choose>
 				
 				<span class="tooltip"><xsl:value-of select="description/brief"/></span>

@@ -225,6 +225,16 @@
 					<xsl:attribute name="kind">property</xsl:attribute>
 				</xsl:when>
 			</xsl:choose>
+			<xsl:if test="../../@kind='protocol'">			
+				<xsl:choose>
+					<xsl:when test="@optional='yes'">
+						<xsl:attribute name="optional">yes</xsl:attribute>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:attribute name="optional">no</xsl:attribute>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:if>
 			<name><xsl:apply-templates select="name"/></name>
 			<type><xsl:apply-templates select="type"/></type>
 			<prototype><xsl:call-template name="prototype"/></prototype>
