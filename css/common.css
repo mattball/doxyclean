@@ -97,6 +97,16 @@ table#metadata ul {
 	list-style: none;
 }
 
+table#metadata ul.inheritance li:after {
+	content: ":";
+	padding: 0 0.5em;
+}
+
+table#metadata ul.inheritance li:last-of-type:after {
+	content: "";
+	padding: 0;
+}
+
 #contents hr {
 	border: 0;
 	color: #aaa;

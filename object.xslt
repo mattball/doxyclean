@@ -146,6 +146,9 @@
 					<xsl:with-param name="path" select="location/@file"/>
 				</xsl:call-template>
 			</file>
+			
+			<xsl:apply-templates select="inheritancegraph/node[label=/doxygen/compounddef/compoundname]"/>
+			
 			<xsl:apply-templates select="detaileddescription/para/simplesect[@kind='author']/para"/>
 			
 			<xsl:if test="briefdescription[para] or detaileddescription[para]">
@@ -303,6 +306,71 @@
 	</xsl:template>
 	<xsl:template match="xrefdescription">
 		<xsl:apply-templates/>
+	</xsl:template>
+	
+	<xsl:template match="inheritancegraph/node" mode="superclass">
+		<name><xsl:apply-templates select="label"/></name>
+		
+		<superclass>
+			<xsl:apply-templates select="childnode" mode="superclass"/>
+		</superclass>
+		
+		<conformsTo>
+			<xsl:apply-templates select="childnode" mode="protocols"/>
+		</conformsTo>
+	</xsl:template>
+	
+	<xsl:template match="inheritancegraph/node" mode="protocol">
+		<name>
+			<xsl:variable name="nameWithLeftBracketRemoved">
+				<xsl:call-template name="replace-string"> <!-- imported template -->
+				    <xsl:with-param name="text" select="label"/>
+					<xsl:with-param name="replace" select="'&lt;'"/>
+		        	<xsl:with-param name="with" select="''"/>
+				</xsl:call-template>
+			</xsl:variable>
+			<xsl:call-template name="replace-string"> <!-- imported template -->
+			    <xsl:with-param name="text" select="$nameWithLeftBracketRemoved"/>
+				<xsl:with-param name="replace" select="'&gt;'"/>
+	        	<xsl:with-param name="with" select="''"/>
+			</xsl:call-template>
+		</name>
+		
+		<conformsTo>
+			<xsl:apply-templates select="childnode" mode="protocols"/>
+		</conformsTo>
+	</xsl:template>
+	
+	<xsl:template match="inheritancegraph/node[label=/doxygen/compounddef/compoundname]">
+		<superclass>
+			<xsl:apply-templates select="childnode" mode="superclass"/>
+		</superclass>
+		
+		<conformsTo>
+			<xsl:apply-templates select="childnode" mode="protocols"/>
+		</conformsTo>
+	</xsl:template>
+	
+	<xsl:template match="inheritancegraph/node/childnode" mode="superclass">
+		<xsl:variable name="nodeID">
+			<xsl:value-of select="@refid"/>
+		</xsl:variable>
+		
+		<xsl:if test="not(starts-with(../../node[@id=$nodeID]/label, '&lt;'))">
+			<xsl:apply-templates select="../../node[@id=$nodeID]" mode="superclass"/>
+		</xsl:if>
+	</xsl:template>
+	
+	<xsl:template match="inheritancegraph/node/childnode" mode="protocols">
+		<xsl:variable name="nodeID">
+			<xsl:value-of select="@refid"/>
+		</xsl:variable>
+		
+		<xsl:if test="starts-with(../../node[@id=$nodeID]/label, '&lt;')">
+			<protocol>
+				<xsl:apply-templates select="../../node[@id=$nodeID]" mode="protocol"/>
+			</protocol>
+		</xsl:if>
 	</xsl:template>
 	
 </xsl:stylesheet>
