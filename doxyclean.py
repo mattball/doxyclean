@@ -636,6 +636,24 @@ def linkify(directory, shouldEstablishIPhoneLinks):
 				documentedTargets.update(dict.fromkeys(macAppKitProtocols, "http://developer.apple.com/mac/library/documentation/Cocoa/Reference/ApplicationKit/Protocols/{name}_Protocol/index"))
 			
 				if verbose:
+					print "Establishing links to Address Book"
+				macAddressBookClasses = [
+					"ABAddressBook",
+					"ABGroup",
+					"ABMultiValue",
+					"ABMutableMultiValue",
+					"ABPeoplePickerView",
+					"ABPerson",
+					"ABRecord",
+					"ABSearchElement"]
+				documentedTargets.update(dict.fromkeys(macAddressBookClasses, "http://developer.apple.com/mac/library/documentation/UserExperience/Reference/AddressBook/Classes/{name}_Class/index"))
+				
+				macAddressBookProtocols = [
+					"ABActionDelegate",
+					"ABImageClient"]
+				documentedTargets.update(dict.fromkeys(macAddressBookProtocols, "http://developer.apple.com/mac/library/documentation/UserExperience/Reference/AddressBook/Protocols/{name}_Protocol/index"))
+			
+				if verbose:
 					print "Establishing links to Core Data"
 				macCoreDataClasses = [
 					"NSAttributeDescription",
@@ -665,6 +683,17 @@ def linkify(directory, shouldEstablishIPhoneLinks):
 					"NSPropertyMapping"]
 				documentedTargets.update(dict.fromkeys(macOtherCoreDataClasses, "http://developer.apple.com/mac/library/documentation/Cocoa/Reference/{name}_Class/index"))
 			
+				if verbose:
+					print "Establishing links to Core Location"
+				macCoreLocationClasses = [
+					"CLLocation",
+					"CLLocationManager"]
+				documentedTargets.update(dict.fromkeys(macCoreLocationClasses, "http://developer.apple.com/mac/library/documentation/CoreLocation/Reference/{name}_Class/index"))
+			
+				macCoreLocationProtocols = [
+					"CLLocationManagerDelegate"]
+				documentedTargets.update(dict.fromkeys(macCoreLocationProtocols, "http://developer.apple.com/mac/library/documentation/CoreLocation/Reference/{name}_Protocol/index"))
+				
 			else:
 				if verbose:
 					print "Establishing links to Foundation"
@@ -782,6 +811,15 @@ def linkify(directory, shouldEstablishIPhoneLinks):
 				documentedTargets.update(dict.fromkeys(iphoneFoundationProtocols, "http://developer.apple.com/iphone/library/documentation/Cocoa/Reference/Foundation/Protocols/{name}_Protocol/index"))
 			
 				if verbose:
+					print "Establishing links to AddressBook"
+				iphoneAddressBookClasses = [
+					"ABAddressBook",
+					"ABMultiValue",
+					"ABMutableMultiValue",
+					"ABRecord"]
+				documentedTargets.update(dict.fromkeys(iphoneAddressBookClasses, "http://developer.apple.com/iphone/library/documentation/AddressBook/Reference/{name}Ref_iPhoneOS/index"))
+					
+				if verbose:
 					print "Establishing links to AddressBookUI"
 				iphoneAddressBookUIClasses = [
 					"ABNewPersonViewController",
@@ -834,6 +872,19 @@ def linkify(directory, shouldEstablishIPhoneLinks):
 				documentedTargets.update(dict.fromkeys(iphoneCoreDataProtocols, "http://developer.apple.com/iphone/library/documentation/CoreData/Reference/{name}_Protocol/index"))
 				
 				if verbose:
+					print "Establishing links to Core Location"
+				iphoneCoreLocationClasses = [
+					"CLHeading",
+					"CLLocation",
+					"CLLocationManager"]
+				documentedTargets.update(dict.fromkeys(iphoneCoreLocationClasses, "http://developer.apple.com/iphone/library/documentation/CoreLocation/Reference/{name}_Class/index"))
+					
+				iphoneCoreLocationProtocols = [
+					"CLLocationManagerDelegate"]
+				documentedTargets.update(dict.fromkeys(iphoneCoreLocationProtocols, "http://developer.apple.com/iphone/library/documentation/CoreLocation/Reference/{name}_Protocol/index"))
+				
+				
+				if verbose:
 					print "Establishing links to GameKit"
 				iphoneGameKitClasses = [
 					"GKPeerPickerController",
@@ -873,6 +924,33 @@ def linkify(directory, shouldEstablishIPhoneLinks):
 				iphoneMessageUIProtocols = [
 					"MFMailComposeViewControllerDelegate"]
 				documentedTargets.update(dict.fromkeys(iphoneMessageUIProtocols, "http://developer.apple.com/iphone/library/documentation/MessageUI/Reference/{name}_Protocol/index"))
+				
+				if verbose:
+					print "Establishing links to StoreKit"
+				iphoneStoreKitClasses = [
+					"SKMutablePayment",
+					"SKPayment",
+					"SKPaymentQueue",
+					"SKPaymentTransaction"]
+				documentedTargets.update(dict.fromkeys(iphoneStoreKitClasses, "http://developer.apple.com/iphone/library/documentation/StoreKit/Reference/{name}_Class/index"))
+			
+				# For whatever reason, this one class gets to live somewhere else...
+				iphoneOtherStoreKitClasses = [
+					"SKProduct"]
+				documentedTargets.update(dict.fromkeys(iphoneOtherStoreKitClasses, "http://developer.apple.com/iphone/library/documentation/StoreKit/Reference/{name}_Reference/index"))
+			
+				iphoneStoreKitProtocols = [
+					"SKPaymentTransactionObserver"]
+				documentedTargets.update(dict.fromkeys(iphoneStoreKitProtocols, "http://developer.apple.com/iphone/library/documentation/StoreKit/Reference/{name}_Protocol/index"))
+			
+				# REALLY?!?
+				iphoneWeirdStoreKitClassesAndProtocols = [
+					"SKProductsRequest",
+					"SKProductsResponse",
+					"SKRequest",
+					"SKProductsRequestDelegate",
+					"SKRequestDelegate"]
+				documentedTargets.update(dict.fromkeys(iphoneWeirdStoreKitClassesAndProtocols, "http://developer.apple.com/iphone/library/documentation/StoreKit/Reference/{name}/index"))
 				
 				if verbose:
 					print "Establishing links to UIKit"
