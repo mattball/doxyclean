@@ -1129,7 +1129,7 @@ def main(argv=None):
 	global verbose
 		
 	# Parse command line options
-	optionParser = OptionParser(version="%prog 2.1")
+	optionParser = OptionParser(version="%prog 2.2")
 	optionParser.add_option("-i", "--input", type="string", dest="inputDirectory", default=os.getcwd(), help="The directory containing Doxygen's XML output. Default is the current directory")
 	optionParser.add_option("-o", "--output", type="string", dest="outputDirectory", default=os.getcwd(), help="The directory to output the converted files to. Default is the current directory")
 	optionParser.add_option("-n", "--name", type="string", dest="projectName", default="Untitled", help="The name of the project")
