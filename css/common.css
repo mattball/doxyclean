@@ -142,7 +142,8 @@ ul.methods li {
 }
 
 .definition {
-	margin-bottom: 4em;
+	display: block;
+	margin-bottom: 3em !important;
 }
 
 code.methodDeclaration {

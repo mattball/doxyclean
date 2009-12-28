@@ -45,6 +45,14 @@ def _mkdir(newdir):
         if tail:
             os.mkdir(newdir)
 
+def longestToShortestCompare(x, y):
+	if len(x) > len(y):
+		return -1
+	elif len(x) < len(y):
+		return 1
+	else:
+		return 0
+
 def fileIsDocumented(filePath):
 	# Only XML files can contain documentation information
 	if not os.path.splitext(filePath)[1] == ".xml":
@@ -179,56 +187,582 @@ def linkify(directory):
 			# We will recreate them ourselves
 			fileContents = re.sub("\\<ref(?: .*)?\\>(.*?)\\</ref\\>", "\\1", fileContents);
 			
-			# Link to all Foundation and AppKit documentation
-			# We don't want links in the name or file or ref
-			macFoundationClassesPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(NSMetadataQueryAttributeValueTuple|NSDistributedNotificationCenter|NSURLAuthenticationChallenge|NSPropertyListSerialization|NSScriptCommandDescription|NSMetadataQueryResultGroup|NSMutableAttributedString|NSScriptExecutionContext|NSScriptClassDescription|NSScriptObjectSpecifier|NSScriptCoercionHandler|NSMessagePortNameServer|NSURLCredentialStorage|NSSocketPortNameServer|NSDistantObjectRequest|NSDecimalNumberHandler|NSAppleEventDescriptor|NSScriptSuiteRegistry|NSPositionalSpecifier|NSMutableCharacterSet|NSMachBootstrapServer|NSInvocationOperation|NSDirectoryEnumerator|NSComparisonPredicate|NSURLProtectionSpace|NSTextCheckingResult|NSNotificationCenter|NSUniqueIDSpecifier|NSRelativeSpecifier|NSPropertySpecifier|NSNotificationQueue|NSNetServiceBrowser|NSMutableURLRequest|NSMutableDictionary|NSHTTPCookieStorage|NSCompoundPredicate|NSCachedURLResponse|NSAppleEventManager|NSValueTransformer|NSPointerFunctions|NSGarbageCollector|NSClassDescription|NSAttributedString|NSAssertionHandler|NSScriptWhoseTest|NSRandomSpecifier|NSProtocolChecker|NSNumberFormatter|NSMutableIndexSet|NSMiddleSpecifier|NSMethodSignature|NSKeyedUnarchiver|NSHTTPURLResponse|NSDistributedLock|NSAutoreleasePool|NSAffineTransform|NSWhoseSpecifier|NSSortDescriptor|NSRangeSpecifier|NSPortNameServer|NSOperationQueue|NSIndexSpecifier|NSDateComponents|NSBlockOperation|NSURLCredential|NSURLConnection|NSSpecifierTest|NSScriptCommand|NSRecursiveLock|NSNameSpecifier|NSMutableString|NSMetadataQuery|NSKeyedArchiver|NSExistsCommand|NSDistantObject|NSDeleteCommand|NSDecimalNumber|NSDateFormatter|NSCreateCommand|NSConditionLock|NSUserDefaults|NSPointerArray|NSOutputStream|NSNotification|NSMutableArray|NSMetadataItem|NSDeserializer|NSCountCommand|NSCloseCommand|NSCloneCommand|NSCharacterSet|NSXMLDocument|NSUndoManager|NSURLResponse|NSURLProtocol|NSURLDownload|NSSpellServer|NSQuitCommand|NSProcessInfo|NSPortMessage|NSOrthography|NSMutableData|NSMoveCommand|NSMessagePort|NSLogicalTest|NSInputStream|NSFileManager|NSAppleScript|NSXMLElement|NSXMLDTDNode|NSUnarchiver|NSURLRequest|NSSocketPort|NSSetCommand|NSSerializer|NSNetService|NSMutableSet|NSInvocation|NSHTTPCookie|NSGetCommand|NSFileHandle|NSExpression|NSEnumerator|NSDictionary|NSCountedSet|NSConnection|NSXMLParser|NSURLHandle|NSPredicate|NSPortCoder|NSOperation|NSIndexPath|NSHashTable|NSFormatter|NSException|NSCondition|NSURLCache|NSTimeZone|NSMapTable|NSMachPort|NSIndexSet|NSCalendar|NSArchiver|NSXMLNode|NSScanner|NSRunLoop|NSXMLDTD|NSThread|NSString|NSStream|NSObject|NSNumber|NSLocale|NSBundle|NSValue|NSTimer|NSProxy|NSError|NSCoder|NSArray|NSTask|NSPort|NSPipe|NSNull|NSLock|NSHost|NSDate|NSData|NSURL|NSSet)"
-			fileContents = re.sub(macFoundationClassesPattern, '\\1<ref id="http://developer.apple.com/mac/library/documentation/Cocoa/Reference/Foundation/Classes/\\2_Class/index">\\2</ref>', fileContents)
+			documentedTargets = {}
 			
-			macFoundationProtocolsPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(NSURLAuthenticationChallengeSender|NSObjCTypeSerializationCallBack|NSScriptingComparisonMethods|NSNetServiceBrowserDelegate|NSKeyedUnarchiverDelegate|NSErrorRecoveryAttempting|NSScriptObjectSpecifiers|NSDecimalNumberBehaviors|NSMetadataQueryDelegate|NSKeyedArchiverDelegate|NSScriptKeyValueCoding|NSSpellServerDelegate|NSNetServiceDelegate|NSConnectionDelegate|NSXMLParserDelegate|NSURLProtocolClient|NSKeyValueObserving|NSComparisonMethods|NSMachPortDelegate|NSURLHandleClient|NSFastEnumeration|NSStreamDelegate|NSMutableCopying|NSKeyValueCoding|NSPortDelegate|NSLocking|NSCopying|NSCoding)"
-			fileContents = re.sub(macFoundationProtocolsPattern, '\\1<ref id="http://developer.apple.com/mac/library/documentation/Cocoa/Reference/Foundation/Protocols/\\2_Protocol/index">\\2</ref>', fileContents)
+			macFoundationClasses = [
+				"NSAffineTransform",
+				"NSAppleEventDescriptor",
+				"NSAppleEventManager",
+				"NSAppleScript",
+				"NSArchiver",
+				"NSArray",
+				"NSAssertionHandler",
+				"NSAttributedString",
+				"NSAutoreleasePool",
+				"NSBlockOperation",
+				"NSBundle",
+				"NSCachedURLResponse",
+				"NSCalendar",
+				"NSCharacterSet",
+				"NSClassDescription",
+				"NSCloneCommand",
+				"NSCloseCommand",
+				"NSCoder",
+				"NSComparisonPredicate",
+				"NSCompoundPredicate",
+				"NSCondition",
+				"NSConditionLock",
+				"NSConnection",
+				"NSCountCommand",
+				"NSCountedSet",
+				"NSCreateCommand",
+				"NSData",
+				"NSDate",
+				"NSDateComponents",
+				"NSDateFormatter",
+				"NSDecimalNumber",
+				"NSDecimalNumberHandler",
+				"NSDeleteCommand",
+				"NSDeserializer",
+				"NSDictionary",
+				"NSDirectoryEnumerator",
+				"NSDistantObject",
+				"NSDistantObjectRequest",
+				"NSDistributedLock",
+				"NSDistributedNotificationCenter",
+				"NSEnumerator",
+				"NSError",
+				"NSException",
+				"NSExistsCommand",
+				"NSExpression",
+				"NSFileHandle",
+				"NSFileManager",
+				"NSFormatter",
+				"NSGarbageCollector",
+				"NSGetCommand",
+				"NSHashTable",
+				"NSHost",
+				"NSHTTPCookie",
+				"NSHTTPCookieStorage",
+				"NSHTTPURLResponse",
+				"NSIndexPath",
+				"NSIndexSet",
+				"NSIndexSpecifier",
+				"NSInputStream",
+				"NSInvocation",
+				"NSInvocationOperation",
+				"NSKeyedArchiver",
+				"NSKeyedUnarchiver",
+				"NSLocale",
+				"NSLock",
+				"NSLogicalTest",
+				"NSMachBootstrapServer",
+				"NSMachPort",
+				"NSMapTable",
+				"NSMessagePort",
+				"NSMessagePortNameServer",
+				"NSMetadataItem",
+				"NSMetadataQuery",
+				"NSMetadataQueryAttributeValueTuple",
+				"NSMetadataQueryResultGroup",
+				"NSMethodSignature",
+				"NSMiddleSpecifier",
+				"NSMoveCommand",
+				"NSMutableArray",
+				"NSMutableAttributedString",
+				"NSMutableCharacterSet",
+				"NSMutableData",
+				"NSMutableDictionary",
+				"NSMutableIndexSet",
+				"NSMutableSet",
+				"NSMutableString",
+				"NSMutableURLRequest",
+				"NSNameSpecifier",
+				"NSNetService",
+				"NSNetServiceBrowser",
+				"NSNotification",
+				"NSNotificationCenter",
+				"NSNotificationQueue",
+				"NSNull",
+				"NSNumber",
+				"NSNumberFormatter",
+				"NSObject",
+				"NSOperation",
+				"NSOperationQueue",
+				"NSOrthography",
+				"NSOutputStream",
+				"NSPipe",
+				"NSPointerArray",
+				"NSPointerFunctions",
+				"NSPort",
+				"NSPortCoder",
+				"NSPortMessage",
+				"NSPortNameServer",
+				"NSPositionalSpecifier",
+				"NSPredicate",
+				"NSProcessInfo",
+				"NSPropertyListSerialization",
+				"NSPropertySpecifier",
+				"NSProtocolChecker",
+				"NSProxy",
+				"NSQuitCommand",
+				"NSRandomSpecifier",
+				"NSRangeSpecifier",
+				"NSRecursiveLock",
+				"NSRelativeSpecifier",
+				"NSRunLoop",
+				"NSScanner",
+				"NSScriptClassDescription",
+				"NSScriptCoercionHandler",
+				"NSScriptCommand",
+				"NSScriptCommandDescription",
+				"NSScriptExecutionContext",
+				"NSScriptObjectSpecifier",
+				"NSScriptSuiteRegistry",
+				"NSScriptWhoseTest",
+				"NSSerializer",
+				"NSSet",
+				"NSSetCommand",
+				"NSSocketPort",
+				"NSSocketPortNameServer",
+				"NSSortDescriptor",
+				"NSSpecifierTest",
+				"NSSpellServer",
+				"NSStream",
+				"NSString",
+				"NSTask",
+				"NSTextCheckingResult",
+				"NSThread",
+				"NSTimer",
+				"NSTimeZone",
+				"NSUnarchiver",
+				"NSUndoManager",
+				"NSUniqueIDSpecifier",
+				"NSURL",
+				"NSURLAuthenticationChallenge",
+				"NSURLCache",
+				"NSURLConnection",
+				"NSURLCredential",
+				"NSURLCredentialStorage",
+				"NSURLDownload",
+				"NSURLHandle",
+				"NSURLProtectionSpace",
+				"NSURLProtocol",
+				"NSURLRequest",
+				"NSURLResponse",
+				"NSUserDefaults",
+				"NSValue",
+				"NSValueTransformer",
+				"NSWhoseSpecifier",
+				"NSXMLDocument",
+				"NSXMLDTD",
+				"NSXMLDTDNode",
+				"NSXMLElement",
+				"NSXMLNode",
+				"NSXMLParser"]
+			documentedTargets.update(dict.fromkeys(macFoundationClasses, "http://developer.apple.com/mac/library/documentation/Cocoa/Reference/Foundation/Classes/{name}_Class/index"))
+				
+			macFoundationProtocols = [
+				"NSCoding",
+				"NSComparisonMethods",
+				"NSConnectionDelegate",
+				"NSCopying",
+				"NSDecimalNumberBehaviors",
+				"NSErrorRecoveryAttempting",
+				"NSFastEnumeration",
+				"NSKeyedArchiverDelegate",
+				"NSKeyedUnarchiverDelegate",
+				"NSKeyValueCoding",
+				"NSKeyValueObserving",
+				"NSLocking",
+				"NSMachPortDelegate",
+				"NSMetadataQueryDelegate",
+				"NSMutableCopying",
+				"NSNetServiceBrowserDelegate",
+				"NSNetServiceDelegate",
+				"NSObjCTypeSerializationCallBack",
+			#	"NSObject", # No way to tell if the class or protocol should be
+			#				linked, so assume the class
+				"NSPortDelegate",
+				"NSScriptingComparisonMethods",
+				"NSScriptKeyValueCoding",
+				"NSScriptObjectSpecifiers",
+				"NSSpellServerDelegate",
+				"NSStreamDelegate",
+				"NSURLAuthenticationChallengeSender",
+				"NSURLHandleClient",
+				"NSURLProtocolClient",
+				"NSXMLParserDelegate"]
+			documentedTargets.update(dict.fromkeys(macFoundationProtocols, "http://developer.apple.com/mac/library/documentation/Cocoa/Reference/Foundation/Protocols/{name}_Protocol/index"))
+				
+			macAppKitClasses = [
+				"NSActionCell",
+				"NSAlert",
+				"NSAnimation",
+				"NSAnimationContext",
+				"NSApplication",
+				"NSArrayController",
+				"NSATSTypesetter",
+				"NSBezierPath",
+				"NSBitmapImageRep",
+				"NSBox",
+				"NSBrowser",
+				"NSBrowserCell",
+				"NSButton",
+				"NSButtonCell",
+				"NSCachedImageRep",
+				"NSCell",
+				"NSCIImageRep",
+				"NSClipView",
+				"NSCollectionView",
+				"NSCollectionViewItem",
+				"NSColor",
+				"NSColorList",
+				"NSColorPanel",
+				"NSColorPicker",
+				"NSColorSpace",
+				"NSColorWell",
+				"NSComboBox",
+				"NSComboBoxCell",
+				"NSControl",
+				"NSController",
+				"NSCursor",
+				"NSCustomImageRep",
+				"NSDatePicker",
+				"NSDatePickerCell",
+				"NSDictionaryController",
+				"NSDockTile",
+				"NSDocument",
+				"NSDocumentController",
+				"NSDrawer",
+				"NSEPSImageRep",
+				"NSEvent",
+				"NSFileWrapper",
+				"NSFont",
+				"NSFontDescriptor",
+				"NSFontManager",
+				"NSFontPanel",
+				"NSForm",
+				"NSFormCell",
+				"NSGlyphGenerator",
+				"NSGlyphInfo",
+				"NSGradient",
+				"NSGraphicsContext",
+				"NSHelpManager",
+				"NSImage",
+				"NSImageCell",
+				"NSImageRep",
+				"NSImageView",
+				"NSLayoutManager",
+				"NSLevelIndicator",
+				"NSLevelIndicatorCell",
+				"NSMatrix",
+				"NSMenu",
+				"NSMenuItem",
+				"NSMenuItemCell",
+				"NSMenuView",
+				"NSMutableParagraphStyle",
+				"NSNib",
+				"NSNibConnector",
+				"NSNibControlConnector",
+				"NSNibOutletConnector",
+				"NSObjectController",
+				"NSOpenGLContext",
+				"NSOpenGLLayer",
+				"NSOpenGLPixelBuffer",
+				"NSOpenGLPixelFormat",
+				"NSOpenGLView",
+				"NSOpenPanel",
+				"NSOutlineView",
+				"NSPageLayout",
+				"NSPanel",
+				"NSParagraphStyle",
+				"NSPasteboard",
+				"NSPasteboardItem",
+				"NSPathCell",
+				"NSPathComponentCell",
+				"NSPathControl",
+				"NSPDFImageRep",
+				"NSPersistentDocument",
+				"NSPICTImageRep",
+				"NSPopUpButton",
+				"NSPopUpButtonCell",
+				"NSPredicateEditor",
+				"NSPredicateEditorRowTemplate",
+				"NSPrinter",
+				"NSPrintInfo",
+				"NSPrintOperation",
+				"NSPrintPanel",
+				"NSProgressIndicator",
+				"NSResponder",
+				"NSRuleEditor",
+				"NSRulerMarker",
+				"NSRulerView",
+				"NSRunningApplication",
+				"NSSavePanel",
+				"NSScreen",
+				"NSScroller",
+				"NSScrollView",
+				"NSSearchField",
+				"NSSearchFieldCell",
+				"NSSecureTextField",
+				"NSSecureTextFieldCell",
+				"NSSegmentedCell",
+				"NSSegmentedControl",
+				"NSShadow",
+				"NSSlider",
+				"NSSliderCell",
+				"NSSound",
+				"NSSpeechRecognizer",
+				"NSSpeechSynthesizer",
+				"NSSpellChecker",
+				"NSSplitView",
+				"NSStatusBar",
+				"NSStatusItem",
+				"NSStepper",
+				"NSStepperCell",
+				"NSTableColumn",
+				"NSTableHeaderCell",
+				"NSTableHeaderView",
+				"NSTableView",
+				"NSTabView",
+				"NSTabViewItem",
+				"NSText",
+				"NSTextAttachment",
+				"NSTextAttachmentCell",
+				"NSTextBlock",
+				"NSTextContainer",
+				"NSTextField",
+				"NSTextFieldCell",
+				"NSTextInputContext",
+				"NSTextList",
+				"NSTextStorage",
+				"NSTextTab",
+				"NSTextTable",
+				"NSTextTableBlock",
+				"NSTextView",
+				"NSTokenField",
+				"NSTokenFieldCell",
+				"NSToolbar",
+				"NSToolbarItem",
+				"NSToolbarItemGroup",
+				"NSTouch",
+				"NSTrackingArea",
+				"NSTreeController",
+				"NSTreeNode",
+				"NSTypesetter",
+				"NSUserDefaultsController",
+				"NSView",
+				"NSViewAnimation",
+				"NSViewController",
+				"NSWindow",
+				"NSWindowController",
+				"NSWorkspace"]
+			documentedTargets.update(dict.fromkeys(macAppKitClasses, "http://developer.apple.com/mac/library/documentation/Cocoa/Reference/ApplicationKit/Classes/{name}_Class/index"))
+				
+			macAppKitProtocols = [
+				"NSAccessibility",
+				"NSAlertDelegate",
+				"NSAnimatablePropertyContainer",
+				"NSAnimationDelegate",
+				"NSApplicationDelegate",
+				"NSBrowserDelegate",
+				"NSChangeSpelling",
+				"NSCollectionViewDelegate",
+				"NSColorPickingCustom",
+				"NSColorPickingDefault",
+				"NSComboBoxCellDataSource",
+				"NSComboBoxDataSource",
+				"NSComboBoxDelegate",
+				"NSControlTextEditingDelegate",
+				"NSDatePickerCellDelegate",
+				"NSDictionaryControllerKeyValuePair",
+				"NSDockTilePlugIn",
+				"NSDraggingDestination",
+				"NSDraggingInfo",
+				"NSDraggingSource",
+				"NSDrawerDelegate",
+				"NSEditor",
+				"NSEditorRegistration",
+				"NSFontPanelValidation",
+				"NSGlyphStorage",
+				"NSIgnoreMisspelledWords",
+				"NSImageDelegate",
+				"NSKeyValueBindingCreation",
+				"NSLayoutManagerDelegate",
+				"NSMatrixDelegate",
+				"NSMenuDelegate",
+				"NSMenuValidation",
+				"NSNibAwaking",
+				"NSOpenSavePanelDelegate",
+				"NSOutlineViewDataSource",
+				"NSOutlineViewDelegate",
+				"NSPasteboardItemDataProvider",
+				"NSPasteboardReading",
+				"NSPasteboardWriting",
+				"NSPathCellDelegate",
+				"NSPathControlDelegate",
+				"NSPlaceholders",
+				"NSPrintPanelAccessorizing",
+				"NSRuleEditorDelegate",
+				"NSServicesRequests",
+				"NSSoundDelegate",
+				"NSSpeechRecognizerDelegate",
+				"NSSpeechSynthesizerDelegate",
+				"NSSplitViewDelegate",
+				"NSTableViewDataSource",
+				"NSTableViewDelegate",
+				"NSTabViewDelegate",
+				"NSTextAttachmentCell",
+				"NSTextDelegate",
+				"NSTextFieldDelegate",
+				"NSTextInput",
+				"NSTextInputClient",
+				"NSTextViewDelegate",
+				"NSTokenFieldCellDelegate",
+				"NSTokenFieldDelegate",
+				"NSToolbarDelegate",
+				"NSToolbarItemValidation",
+				"NSToolTipOwner",
+				"NSUserInterfaceValidations",
+				"NSValidatedUserInterfaceItem",
+				"NSWindowDelegate",
+				"NSWindowScripting"]
+			documentedTargets.update(dict.fromkeys(macAppKitProtocols, "http://developer.apple.com/mac/library/documentation/Cocoa/Reference/ApplicationKit/Protocols/{name}_Protocol/index"))
 			
-			macAppKitClassesPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(NSPredicateEditorRowTemplate|NSUserDefaultsController|NSMutableParagraphStyle|NSDictionaryController|NSSecureTextFieldCell|NSNibControlConnector|NSTextAttachmentCell|NSRunningApplication|NSPersistentDocument|NSNibOutletConnector|NSLevelIndicatorCell|NSDocumentController|NSCollectionViewItem|NSSpeechSynthesizer|NSProgressIndicator|NSPathComponentCell|NSOpenGLPixelFormat|NSOpenGLPixelBuffer|NSWindowController|NSToolbarItemGroup|NSTextInputContext|NSSpeechRecognizer|NSSegmentedControl|NSObjectController|NSAnimationContext|NSTableHeaderView|NSTableHeaderCell|NSSecureTextField|NSSearchFieldCell|NSPredicateEditor|NSPopUpButtonCell|NSGraphicsContext|NSArrayController|NSViewController|NSTreeController|NSTokenFieldCell|NSTextTableBlock|NSTextAttachment|NSPrintOperation|NSPasteboardItem|NSParagraphStyle|NSLevelIndicator|NSGlyphGenerator|NSFontDescriptor|NSDatePickerCell|NSCustomImageRep|NSCollectionView|NSCachedImageRep|NSBitmapImageRep|NSViewAnimation|NSTextFieldCell|NSTextContainer|NSSegmentedCell|NSOpenGLContext|NSLayoutManager|NSATSTypesetter|NSTrackingArea|NSSpellChecker|NSPICTImageRep|NSNibConnector|NSMenuItemCell|NSComboBoxCell|NSToolbarItem|NSTextStorage|NSTableColumn|NSTabViewItem|NSStepperCell|NSSearchField|NSRulerMarker|NSPopUpButton|NSPathControl|NSPDFImageRep|NSOutlineView|NSOpenGLLayer|NSHelpManager|NSFontManager|NSFileWrapper|NSEPSImageRep|NSColorPicker|NSBrowserCell|NSApplication|NSTypesetter|NSTokenField|NSStatusItem|NSSliderCell|NSScrollView|NSRuleEditor|NSPrintPanel|NSPasteboard|NSPageLayout|NSOpenGLView|NSDatePicker|NSController|NSColorSpace|NSColorPanel|NSCIImageRep|NSButtonCell|NSBezierPath|NSActionCell|NSWorkspace|NSTextTable|NSTextField|NSTextBlock|NSTableView|NSStatusBar|NSSplitView|NSSavePanel|NSRulerView|NSResponder|NSPrintInfo|NSOpenPanel|NSImageView|NSImageCell|NSGlyphInfo|NSFontPanel|NSColorWell|NSColorList|NSAnimation|NSTreeNode|NSTextView|NSTextList|NSScroller|NSPathCell|NSMenuView|NSMenuItem|NSImageRep|NSGradient|NSFormCell|NSDocument|NSDockTile|NSComboBox|NSClipView|NSToolbar|NSTextTab|NSTabView|NSStepper|NSPrinter|NSControl|NSBrowser|NSWindow|NSSlider|NSShadow|NSScreen|NSMatrix|NSDrawer|NSCursor|NSButton|NSTouch|NSSound|NSPanel|NSImage|NSEvent|NSColor|NSAlert|NSView|NSText|NSMenu|NSForm|NSFont|NSCell|NSNib|NSBox)"
-			fileContents = re.sub(macAppKitClassesPattern, '\\1<ref id="http://developer.apple.com/mac/library/documentation/Cocoa/Reference/ApplicationKit/Classes/\\2_Class/index">\\2</ref>', fileContents)
-			
-			macAppKitProtocolsPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(NSDictionaryControllerKeyValuePair|NSAnimatablePropertyContainer|NSValidatedUserInterfaceItem|NSPasteboardItemDataProvider|NSControlTextEditingDelegate|NSSpeechSynthesizerDelegate|NSUserInterfaceValidations|NSSpeechRecognizerDelegate|NSPrintPanelAccessorizing|NSKeyValueBindingCreation|NSTokenFieldCellDelegate|NSDatePickerCellDelegate|NSComboBoxCellDataSource|NSCollectionViewDelegate|NSToolbarItemValidation|NSOutlineViewDataSource|NSOpenSavePanelDelegate|NSLayoutManagerDelegate|NSIgnoreMisspelledWords|NSTableViewDataSource|NSPathControlDelegate|NSOutlineViewDelegate|NSFontPanelValidation|NSDraggingDestination|NSColorPickingDefault|NSApplicationDelegate|NSTokenFieldDelegate|NSTextAttachmentCell|NSRuleEditorDelegate|NSEditorRegistration|NSComboBoxDataSource|NSColorPickingCustom|NSTextFieldDelegate|NSTableViewDelegate|NSSplitViewDelegate|NSPasteboardWriting|NSPasteboardReading|NSAnimationDelegate|NSTextViewDelegate|NSServicesRequests|NSPathCellDelegate|NSComboBoxDelegate|NSWindowScripting|NSToolbarDelegate|NSTextInputClient|NSTabViewDelegate|NSBrowserDelegate|NSWindowDelegate|NSMenuValidation|NSMatrixDelegate|NSDrawerDelegate|NSDraggingSource|NSDockTilePlugIn|NSChangeSpelling|NSSoundDelegate|NSImageDelegate|NSAlertDelegate|NSAccessibility|NSToolTipOwner|NSTextDelegate|NSPlaceholders|NSMenuDelegate|NSGlyphStorage|NSDraggingInfo|NSNibAwaking|NSTextInput|NSEditor)"
-			fileContents = re.sub(macAppKitProtocolsPattern, '\\1<ref id="http://developer.apple.com/mac/library/documentation/Cocoa/Reference/ApplicationKit/Protocols/\\2_Protocol/index">\\2</ref>', fileContents)
-			
-			# iPhone-specific frameworks
-			iphoneAddressBookUIClassesPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(ABPeoplePickerNavigationController|ABUnknownPersonViewController|ABNewPersonViewController|ABPersonViewController)"
-			fileContents = re.sub(iphoneAddressBookUIClassesPattern, '\\1<ref id="http://developer.apple.com/iphone/library/documentation/AddressBookUI/Reference/\\2_Class/index">\\2</ref>', fileContents)
-			
-			iphoneAddressBookUIProtocolsPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(ABPeoplePickerNavigationControllerDelegate|ABUnknownPersonViewControllerDelegate|ABNewPersonViewControllerDelegate|ABPersonViewControllerDelegate)"
-			fileContents = re.sub(iphoneAddressBookUIProtocolsPattern, '\\1<ref id="http://developer.apple.com/iphone/library/documentation/AddressBookUI/Reference/\\2_Protocol/index">\\2</ref>', fileContents)
-			
-			iphoneGameKitClassesPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(GKPeerPickerController|GKVoiceChatService|GKSession)"
-			fileContents = re.sub(iphoneGameKitClassesPattern, '\\1<ref id="http://developer.apple.com/iphone/library/documentation/GameKit/Reference/\\2_Class/index">\\2</ref>', fileContents)
-			
-			iphoneGameKitProtocolsPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(GKPeerPickerControllerDelegate|GKSessionDelegate|GKVoiceChatClient)"
-			fileContents = re.sub(iphoneGameKitProtocolsPattern, '\\1<ref id="http://developer.apple.com/iphone/library/documentation/GameKit/Reference/\\2_Protocol/index">\\2</ref>', fileContents)
-			
-			iphoneMapKitClassesPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(MKPinAnnotationView|MKReverseGeocoder|MKAnnotationView|MKUserLocation|MKPlacemark|MKMapView)"
-			fileContents = re.sub(iphoneMapKitClassesPattern, '\\1<ref id="http://developer.apple.com/iphone/library/documentation/MapKit/Reference/\\2_Class/index">\\2</ref>', fileContents)
-			
-			iphoneMapKitProtocolsPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(MKReverseGeocoderDelegate|MKMapViewDelegate|MKAnnotation)"
-			fileContents = re.sub(iphoneMapKitProtocolsPattern, '\\1<ref id="http://developer.apple.com/iphone/library/documentation/MapKit/Reference/\\2_Protocol/index">\\2</ref>', fileContents)
-			
-			iphoneMessageUIClassesPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(MFMailComposeViewController)"
-			fileContents = re.sub(iphoneMessageUIClassesPattern, '\\1<ref id="http://developer.apple.com/iphone/library/documentation/MessageUI/Reference/\\2_Class/index">\\2</ref>', fileContents)
-			
-			iphoneMessageUIProtocolsPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(MFMailComposeViewControllerDelegate)"
-			fileContents = re.sub(iphoneMessageUIProtocolsPattern, '\\1<ref id="http://developer.apple.com/iphone/library/documentation/MessageUI/Reference/\\2_Protocol/index">\\2</ref>', fileContents)
-			
-			iphoneUIKitClassesPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(UILocalizedIndexedCollation|UISearchDisplayController|UIVideoEditorController|UIImagePickerController|UIActivityIndicatorView|UINavigationController|UIAccessibilityElement|UITableViewController|UITabBarController|UISegmentedControl|UIViewController|UINavigationItem|UIMenuController|UITableViewCell|UINavigationBar|UIBarButtonItem|UIAccelerometer|UIProgressView|UIAcceleration|UIPageControl|UIApplication|UIActionSheet|UITabBarItem|UIScrollView|UIPickerView|UIPasteboard|UIDatePicker|UITextField|UITableView|UISearchBar|UIResponder|UIImageView|UIAlertView|UITextView|UIWebView|UIToolbar|UIControl|UIBarItem|UIWindow|UITabBar|UISwitch|UISlider|UIScreen|UIDevice|UIButton|UITouch|UILabel|UIImage|UIEvent|UIColor|UIView|UIFont)"
-			fileContents = re.sub(iphoneUIKitClassesPattern, '\\1<ref id="http://developer.apple.com/iphone/library/documentation/UIKit/Reference/\\2_Class/index">\\2</ref>', fileContents)
-			
-			iphoneUIKitProtocolsPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(UIVideoEditorControllerDelegate|UIImagePickerControllerDelegate|UIResponderStandardEditActions|UINavigationControllerDelegate|UITabBarControllerDelegate|UIAccessibilityContainer|UISearchDisplayDelegate|UINavigationBarDelegate|UIAccelerometerDelegate|UIPickerViewDataSource|UITableViewDataSource|UIApplicationDelegate|UIActionSheetDelegate|UIScrollViewDelegate|UIPickerViewDelegate|UITextFieldDelegate|UITableViewDelegate|UISearchBarDelegate|UIAlertViewDelegate|UITextViewDelegate|UIWebViewDelegate|UITextInputTraits|UITabBarDelegate|UIAccessibility)"
-			fileContents = re.sub(iphoneUIKitProtocolsPattern, '\\1<ref id="http://developer.apple.com/iphone/library/documentation/UIKit/Reference/\\2_Protocol/index">\\2</ref>', fileContents)
+				
+			iphoneAddressBookUIClasses = [
+				"ABNewPersonViewController",
+				"ABPeoplePickerNavigationController",
+				"ABPersonViewController",
+				"ABUnknownPersonViewController"]
+			documentedTargets.update(dict.fromkeys(iphoneAddressBookUIClasses, "http://developer.apple.com/iphone/library/documentation/AddressBookUI/Reference/{name}_Class/index"))
+				
+			iphoneAddressBookUIProtocols = [
+				"ABNewPersonViewControllerDelegate",
+				"ABPeoplePickerNavigationControllerDelegate",
+				"ABPersonViewControllerDelegate",
+				"ABUnknownPersonViewControllerDelegate"]
+			documentedTargets.update(dict.fromkeys(iphoneAddressBookUIProtocols, "http://developer.apple.com/iphone/library/documentation/AddressBookUI/Reference/{name}_Protocol/index"))
+				
+			iphoneGameKitClasses = [
+				"GKPeerPickerController",
+				"GKSession",
+				"GKVoiceChatService"]
+			documentedTargets.update(dict.fromkeys(iphoneGameKitClasses, "http://developer.apple.com/iphone/library/documentation/GameKit/Reference/{name}_Class/index"))
+				
+			iphoneGameKitProtocols = [
+				"GKPeerPickerControllerDelegate",
+				"GKSessionDelegate",
+				"GKVoiceChatClient"]
+			documentedTargets.update(dict.fromkeys(iphoneGameKitProtocols, "http://developer.apple.com/iphone/library/documentation/GameKit/Reference/{name}_Protocol/index"))
+				
+			iphoneMapKitClasses = [
+				"MKAnnotationView",
+				"MKMapView",
+				"MKPinAnnotationView",
+				"MKPlacemark",
+				"MKReverseGeocoder",
+				"MKUserLocation"]
+			documentedTargets.update(dict.fromkeys(iphoneMapKitClasses, "http://developer.apple.com/iphone/library/documentation/MapKit/Reference/{name}_Class/index"))
+				
+			iphoneMapKitProtocols = [
+				"MKAnnotation",
+				"MKMapViewDelegate",
+				"MKReverseGeocoderDelegate"]
+			documentedTargets.update(dict.fromkeys(iphoneMapKitProtocols, "http://developer.apple.com/iphone/library/documentation/MapKit/Reference/{name}_Protocol/index"))
+				
+			iphoneMessageUIClasses = [
+				"MFMailComposeViewController"]
+			documentedTargets.update(dict.fromkeys(iphoneMessageUIClasses, "http://developer.apple.com/iphone/library/documentation/MessageUI/Reference/{name}_Class/index"))
+				
+			iphoneMessageUIProtocols = [
+				"MFMailComposeViewControllerDelegate"]
+			documentedTargets.update(dict.fromkeys(iphoneMessageUIProtocols, "http://developer.apple.com/iphone/library/documentation/MessageUI/Reference/{name}_Protocol/index"))
+				
+			iphoneUIKitClasses = [
+				"UIAcceleration",
+				"UIAccelerometer",
+				"UIAccessibilityElement",
+				"UIActionSheet",
+				"UIActivityIndicatorView",
+				"UIAlertView",
+				"UIApplication",
+				"UIBarButtonItem",
+				"UIBarItem",
+				"UIButton",
+				"UIColor",
+				"UIControl",
+				"UIDatePicker",
+				"UIDevice",
+				"UIEvent",
+				"UIFont",
+				"UIImage",
+				"UIImagePickerController",
+				"UIImageView",
+				"UILabel",
+				"UILocalizedIndexedCollation",
+				"UIMenuController",
+				"UINavigationBar",
+				"UINavigationController",
+				"UINavigationItem",
+				"UIPageControl",
+				"UIPasteboard",
+				"UIPickerView",
+				"UIProgressView",
+				"UIResponder",
+				"UIScreen",
+				"UIScrollView",
+				"UISearchBar",
+				"UISearchDisplayController",
+				"UISegmentedControl",
+				"UISlider",
+				"UISwitch",
+				"UITabBar",
+				"UITabBarController",
+				"UITabBarItem",
+				"UITableView",
+				"UITableViewCell",
+				"UITableViewController",
+				"UITextField",
+				"UITextView",
+				"UIToolbar",
+				"UITouch",
+				"UIVideoEditorController",
+				"UIView",
+				"UIViewController",
+				"UIWebView",
+				"UIWindow"]
+			documentedTargets.update(dict.fromkeys(iphoneUIKitClasses, "http://developer.apple.com/iphone/library/documentation/UIKit/Reference/{name}_Class/index"))
+				
+			iphoneUIKitProtocols = [
+				"UIAccelerometerDelegate",
+				"UIAccessibility",
+				"UIAccessibilityContainer",
+				"UIActionSheetDelegate",
+				"UIAlertViewDelegate",
+				"UIApplicationDelegate",
+				"UIImagePickerControllerDelegate",
+				"UINavigationBarDelegate",
+				"UINavigationControllerDelegate",
+				"UIPickerViewDataSource",
+				"UIPickerViewDelegate",
+				"UIResponderStandardEditActions",
+				"UIScrollViewDelegate",
+				"UISearchBarDelegate",
+				"UISearchDisplayDelegate",
+				"UITabBarControllerDelegate",
+				"UITabBarDelegate",
+				"UITableViewDataSource",
+				"UITableViewDelegate",
+				"UITextFieldDelegate",
+				"UITextInputTraits",
+				"UITextViewDelegate",
+				"UIVideoEditorControllerDelegate",
+				"UIWebViewDelegate"]
+			documentedTargets.update(dict.fromkeys(iphoneUIKitProtocols, "http://developer.apple.com/iphone/library/documentation/UIKit/Reference/{name}_Protocol/index"))
 			
 			# Establish links to all files in the project
-			classesList = []
-			categoriesList = []
-			protocolsList = []
-			
 			for documentedObject in documentedObjects:
 				# We need to get rid of whitespace
 				# (It's a "feature" of minidom)
@@ -236,27 +770,39 @@ def linkify(directory):
 				objectType = documentedObject.parentNode.attributes["kind"].value
 				
 				if objectType == "class":
-					classesList.append(objectName)
+					target = "../Classes/{name}"
 				elif objectType == "category":
-					categoriesList.append(objectName)
+					target = "../Categories/{name}"
 				elif objectType == "protocol":
-					protocolsList.append(objectName)
+					target = "../Protocols/{name}"
 					
-			if classesList:
-				projectClassesPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(" + '|'.join(classesList) + ")"
-				fileContents = re.sub(projectClassesPattern, '\\1<ref id="../Classes/\\2">\\2</ref>', fileContents)
+				documentedTargets[objectName] = target
 			
-			if categoriesList:
-				projectCategoriesPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(" + '|'.join(categoriesList) + ")"
-				fileContents = re.sub(projectCategoriesPattern, '\\1<ref id="../Categories/\\2">\\2</ref>', fileContents)
-			
-			if protocolsList:
-				projectProtocolsPattern = "(?<!\\<name\\>|\\<file\\>)([^\\<|^\\>]*)(" + '|'.join(protocolsList) + ")"
-				fileContents = re.sub(projectProtocolsPattern, '\\1<ref id="../Protocols/\\2">\\2</ref>', fileContents)
-			
+			documentedTargetNames = documentedTargets.keys()
+			documentedTargetNames.sort(cmp=longestToShortestCompare)
+			documentedTargetsPattern = "([^\\<\\>]*)(" + '|'.join(documentedTargetNames) + ")"
+			fileContents = re.sub(documentedTargetsPattern, "\\1<ref>\\2</ref>", fileContents)
+				
+			fileDOM = minidom.parseString(fileContents)
+			refNodes = fileDOM.getElementsByTagName("ref")
+			for refNode in refNodes:
+				# If it's within the top-level <name> or <file> elements,
+				# remove the <ref>
+				# This is no longer checked in the regex since <name> or <file>
+				# could feasibly be used in other contexts (ie: inheritance lists)
+				if ((refNode.parentNode.tagName == "name") or (refNode.parentNode.tagName == "file")) and (refNode.parentNode.parentNode.tagName == "object"):
+					textNode = fileDOM.createTextNode(refNode.childNodes[0].nodeValue)
+					refNode.parentNode.replaceChild(textNode, refNode)
+					continue
+				
+				refName = refNode.childNodes[0].nodeValue
+				formatString = documentedTargets[refName]
+				refTarget = formatString.format(name=refName)
+				refNode.setAttribute("id", refTarget)
+	
 			# Write the xml file
-			f = open(filePath, "w")
-			f.write(fileContents)			
+			f = open(filePath, "w")			
+			f.write(fileDOM.toxml("UTF-8"))
 			f.close()
 			
 def convertToHTML(filePath, outputDirectory):
