@@ -241,3 +241,16 @@ ul.methods li span.tooltipRegion:hover span.tooltip {
 	margin: 0 0 4px 0;
 	padding: 0;
 	}
+
+.programlisting {
+    font-family: Monaco, Courier, monospace;
+    font-size: 1.4em;
+    color: rgb(102, 102, 102);
+    line-height: 180%;
+    background-color: rgb(241, 245, 249);
+    border-color: rgb(199, 207, 213);
+    border-style: solid;
+    border-width: 1px;
+    border-collapse: collapse;
+    padding: 1em;
+}
