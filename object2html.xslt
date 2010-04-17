@@ -375,9 +375,8 @@
 						<xsl:text> </xsl:text><span class="specialType">required</span>
 					</xsl:when>
 				</xsl:choose>
-				
-				<span class="tooltip"><xsl:value-of select="description/brief"/></span>
 			</span>
+			<span class="tooltip"><xsl:value-of select="description/brief"/></span>
 		</li>
 	</xsl:template>
 	
