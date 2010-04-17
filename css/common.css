@@ -122,7 +122,7 @@ table#metadata ul.inheritance li:last-of-type:after {
 }
 
 code {
-	font-family: Monaco, 'Courier New', Courier, monospace;
+	font-family: Menlo, Monaco, 'Courier New', Courier, monospace;
 	font-size: 1.1em;
 	color: #333;
 }
@@ -242,10 +242,8 @@ ul.methods li span.tooltipRegion:hover span.tooltip {
 	padding: 0;
 	}
 
-.programlisting {
-    font-family: Monaco, Courier, monospace;
-    font-size: 1.4em;
-    color: rgb(102, 102, 102);
+code pre {
+    color: rgb(80, 80, 80);
     line-height: 180%;
     background-color: rgb(241, 245, 249);
     border-color: rgb(199, 207, 213);

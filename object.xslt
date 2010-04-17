@@ -373,28 +373,25 @@
 		</xsl:if>
 	</xsl:template>
 
-	<!-- Copy most of programlisting through unchanged -->
+	<!-- Copy most of programlisting through -->
 	<xsl:template match="programlisting">
-	  <programlisting>
+	  <codeblock>
 	    <xsl:apply-templates />
-	  </programlisting>
+	  </codeblock>
 	</xsl:template>
-
-	<!-- Remove 'ref' elements, but copy their content -->
-	<xsl:template match="programlisting//ref">
-	  <xsl:apply-templates />
+	
+	<xsl:template match="programlisting/codeline">
+		<xsl:apply-templates /><xsl:text>
+</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="programlisting//sp">
+		<xsl:text> </xsl:text>
 	</xsl:template>
 
 	<!-- Copy through other children of programlisting -->
 	<xsl:template match="programlisting//*">
-	  <xsl:copy>
-	    <xsl:apply-templates select="@*" />
 	    <xsl:apply-templates />
-	  </xsl:copy>
 	</xsl:template>
-
-	<!-- Copy attributes by default -->
-	<xsl:template match="@*">
-	  <xsl:copy />
-	</xsl:template>
+	
 </xsl:stylesheet>

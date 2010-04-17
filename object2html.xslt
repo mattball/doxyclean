@@ -442,6 +442,21 @@
 		</span>
 	</xsl:template>
 	
+	<!-- Don't put the <code> tag for links inside a prototype -->
+	<xsl:template match="prototype//ref">
+		<xsl:choose>
+			<xsl:when test="/object/name != child::node()[1]">
+				<a>
+					<xsl:attribute name="href"><xsl:value-of select="@id"/>.html</xsl:attribute>
+					<xsl:apply-templates/>
+				</a>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
 	<xsl:template match="parameters">
 		<h5>Parameters</h5>
 		<dl class="parameterList">
@@ -538,37 +553,28 @@
 		</code>
 	</xsl:template>
 
-	<!-- Block for a programlisting -->
-	<xsl:template match="programlisting">
-	  <div class="programlisting">
-	    <xsl:apply-templates />
-	  </div>
+	<!-- Block for a codeblock -->
+	<xsl:template match="codeblock">
+	  <code>
+		<pre>
+	    	<xsl:apply-templates />
+		</pre>
+	  </code>
+	</xsl:template>
+	
+	<!-- Don't put the <code> tag for links inside a codeblock -->
+	<xsl:template match="codeblock//ref">
+		<xsl:choose>
+			<xsl:when test="/object/name != child::node()[1]">
+				<a>
+					<xsl:attribute name="href"><xsl:value-of select="@id"/>.html</xsl:attribute>
+					<xsl:apply-templates/>
+				</a>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
-	<!-- Render each line as a div -->
-	<xsl:template match="codeline">
-	  <div class="codeline">
-	    <xsl:apply-templates />
-	  </div>
-	</xsl:template>
-
-	<!-- Print a literal space -->
-	<xsl:template match="sp">
-	  <xsl:text> </xsl:text>
-	</xsl:template>
-
-	<!-- Copy the highlight class to a span -->
-	<xsl:template match="highlight">
-	  <span>
-	    <xsl:attribute name="class">
-	      <xsl:value-of select="@class" />
-	    </xsl:attribute>
-	    <xsl:apply-templates />
-	  </span>
-	</xsl:template>
-
-	<!-- Remove ref elements that are descendants of a codeline element -->
-	<xsl:template match="codeline//ref">
-	  <xsl:apply-templates />
-	</xsl:template>
 </xsl:stylesheet>
